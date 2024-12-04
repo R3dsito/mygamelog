@@ -1,0 +1,82 @@
+.login {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    padding-bottom: 24px;
+
+    & p {
+        text-align: center;
+        margin-top: 16px;
+        font-size: 14px;
+    }
+
+    & p a {
+        text-align: center;
+        margin-top: 16px;
+        font-weight: 600;
+    }
+
+    & p i {
+        margin-right: 8px;
+    }
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 350px;
+    border: 2px solid wheat;
+    padding: 32px 24px;
+    border-radius: 20px;
+
+    & h2 {
+        margin-bottom: 24px;
+    }
+
+
+    & form {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    & input {
+        width: 100%;
+        background-color: unset;
+        border: 2px solid wheat;
+        border-radius: 25px;
+        padding: 8px 16px;
+        margin-bottom: 16px;
+    }
+
+    & input::placeholder {
+        color: wheat;
+    }
+
+    & input:focus {
+        outline: none;
+    }
+
+
+    & button {
+        width: 100%;
+        background-color: wheat;
+        color: #021603f6;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        font-weight: 600;
+        padding: 4px 16px;
+        border-radius: 25px;
+        transition: .5s;
+    }
+
+    & button:hover {
+        background-color: rgba(245, 222, 179, .80);
+    }
+}

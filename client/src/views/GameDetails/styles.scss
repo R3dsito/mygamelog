@@ -1,0 +1,186 @@
+.game-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    padding-bottom: 24px;
+
+    &__loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 32px;
+        flex: 1;
+    }
+
+    &__loading p {
+        margin-top: 8px;
+    }
+
+    &__header {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        &__images {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            height: 250px;
+            background-position-y: 50%;
+            background-size: cover;
+            border-bottom: 5px solid wheat;
+
+            & h3 {
+                font-size: 24px;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8)
+            }
+
+            & div {
+                margin-bottom: 8px;
+            }
+        }
+    }
+
+    &__content {
+        width: 75%;
+        padding: 32px 24px;
+
+        &__actions {
+            display: flex;
+            justify-content: center;
+        }
+
+        &__actions button {
+            background-color: unset;
+            border: 2px solid wheat;
+            cursor: pointer;
+            font-size: 18px;
+            color: wheat;
+            font-weight: 600;
+            padding: 4px 16px;
+            border-radius: 25px;
+            transition: .5s;
+        }
+
+        &__actions button:hover {
+            background-color: rgba(245, 222, 179, .25);
+        }
+
+        & h4 {
+            margin-bottom: 16px;
+        }
+
+        & h4:not(:first-child) {
+            margin-top: 24px;
+            padding-top: 8px;
+            border-top: 1px solid wheat;
+        }
+
+        &__tags {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 16px;
+            align-items: center;
+            text-align: center;
+        }
+
+        &__tags span {
+            font-size: 12px;
+            padding: 4px 8px;
+            background-color: rgba(43, 140, 105, .25);
+            border-radius: 10px;
+            font-weight: 600;
+
+        }
+
+        &__platforms {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 16px;
+            align-items: center;
+            text-align: center;
+        }
+
+        &__platforms span {
+            font-size: 12px;
+            padding: 4px 8px;
+            background-color: rgba(227, 194, 73, .80);
+            border-radius: 10px;
+            color: #021603f6;
+            font-weight: 600;
+        }
+
+        &__loading {
+            display: flex;
+            justify-content: center;
+        }
+
+        &__error {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        &__error span {
+            margin-bottom: 8px;
+        }
+
+        &__reviews .review:not(:last-child) {
+            margin-bottom: 16px;
+        }
+    }
+}
+
+.new-review-modal {
+    display: flex;
+    flex-direction: column;
+
+    &__rating {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 24px;
+    }
+
+    &__rating button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        margin-top: 0 !important;
+    }
+
+    &__rating button i {
+        width: 15px;
+        height: 15px;
+    }
+
+    & textarea {
+        border: 2px solid #021603f6;
+        border-radius: 10px;
+        padding: 8px;
+        color: #021603f6;
+    }
+
+    & button {
+        margin-top: 24px;
+        background-color: #021603f6;
+        border: none;
+        border-radius: 25px;
+        padding: 8px 0;
+        font-weight: 600;
+        color: white;
+        cursor: pointer;
+        transition: .5s;
+    }
+
+    & button:hover {
+        background-color: rgba(2, 22, 3, 0.95);
+    }
+}

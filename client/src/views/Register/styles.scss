@@ -1,0 +1,24 @@
+.register {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    padding-bottom: 24px;
+
+    & p {
+        text-align: center;
+        margin-top: 16px;
+        font-size: 14px;
+    }
+
+    & p a {
+        text-align: center;
+        margin-top: 16px;
+        font-weight: 600;
+    }
+
+    & p i {
+        margin-right: 8px;
+    }
+}

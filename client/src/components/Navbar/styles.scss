@@ -1,0 +1,54 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-bottom: 1px solid wheat;
+
+    & div {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    & div h1 {
+        display: none;
+    }
+
+    & div img {
+        width: 100%;
+        height: 50px;
+    }
+
+    & ul {
+        display: flex;
+    }
+
+    & ul li {
+        display: flex;
+        align-items: center;
+    }
+
+    & ul li:not(:last-child) {
+        margin-right: 16px;
+    }
+
+    & ul li a {
+        text-decoration: none;
+        text-transform: uppercase;
+    }
+
+    & ul li a i,
+    & ul li button i {
+        margin-right: 8px;
+
+    }
+
+    & ul li button {
+        background-color: unset;
+        border: none;
+        text-transform: uppercase;
+        font-size: 16px;
+        cursor: pointer;
+
+    }
+}

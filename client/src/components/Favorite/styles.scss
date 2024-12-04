@@ -1,0 +1,22 @@
+.favorite {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    text-align: center;
+    border: 2px solid wheat;
+    border-radius: 10px;
+    height: 200px;
+    background-position-x: 50%;
+    background-size: cover;
+    cursor: pointer;
+
+    & p {
+        font-size: 14px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8)
+    }
+
+    & span {
+        font-size: 14px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8)
+    }
+}

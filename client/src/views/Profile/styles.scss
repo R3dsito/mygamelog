@@ -1,0 +1,126 @@
+.profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  padding-bottom: 24px;
+
+  &__header {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    &__images {
+      display: flex;
+      justify-content: center;
+      height: 250px;
+      background-position-y: 90%;
+      border-bottom: 5px solid wheat;
+
+      & div {
+        position: relative;
+        top: 175px;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: 5px solid wheat;
+      }
+
+      & div img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+      }
+    }
+
+    &__data {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: calc(75px + 16px);
+
+      & > div {
+        display: flex;
+        margin-top: 16px;
+      }
+
+      & div div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      & div div:nth-child(2) {
+        margin: 0 32px;
+      }
+
+      & div span {
+        font-weight: 600;
+      }
+
+      & div p {
+        text-transform: uppercase;
+      }
+    }
+  }
+
+  &__loading {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__error span {
+    margin-bottom: 8px;
+  }
+
+  &__favorites {
+    width: 75%;
+    text-align: center;
+    margin-top: 32px;
+    border-top: 1px solid wheat;
+
+    & h3 {
+      margin: 16px 0;
+    }
+
+    &__list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(20%, 1fr));
+      gap: 16px;
+    }
+
+    &__list .favorite {
+      padding: 8px;
+    }
+  }
+
+  &__reviews {
+    width: 75%;
+    text-align: center;
+    margin-top: 32px;
+    border-top: 1px solid wheat;
+
+    & h3 {
+      margin: 16px 0;
+    }
+
+    &__list {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    &__list .review {
+      width: 100%;
+      margin-bottom: 16px;
+    }
+  }
+}
