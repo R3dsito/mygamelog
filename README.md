@@ -47,8 +47,10 @@ myGameLog es una aplicación web que permite a los usuarios buscar juegos, ver d
 ## Iniciar proyecto
 **Abrir terminal**
 -cd api
+-npm i
 -npm start
 
 **Abrir otra terminal**
 -cd kanban
+-npm i
 -npm run dev
