@@ -7,20 +7,24 @@ import { Loader, Modal, Review } from "@/components";
 import useGetGame from "@/hooks/useGetGame";
 import useGetReviews from "@/hooks/useGetReviews";
 import usePostReview from "@/hooks/usePostReview";
+import useDeleteReview from "@/hooks/useDeleteReview";
+import useToggleFavorite from "@/hooks/useToggleFavorite";
 
 import { AuthContext } from "@/contexts/AuthContext";
 
 const GameDetails = () => {
   const [searchParams] = useSearchParams();
   const { user } = useContext(AuthContext);
-
+  const { deleteReview } = useDeleteReview();
   const id = searchParams.get("id");
-
+  const { toggleFavorite, loading } = useToggleFavorite();
+  const [isFavorite, setIsFavorite] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [reviewData, setReviewData] = useState({
-    score: 0,
-    review: "",
-  });
+const [reviewData, setReviewData] = useState({
+  score: 0,
+  review: "",
+  addToFavorites: false,
+});
 
   const {
     state: gameState,
@@ -53,6 +57,28 @@ const GameDetails = () => {
     content: reviewData?.review,
     rating: reviewData?.score,
   });
+
+  const handleDelete = async (reviewId) => {
+  await deleteReview(reviewId);
+  getReviews();
+};
+
+console.log(reviewData);
+
+const handleToggleFavorite = async () => {
+  try {
+    const res = await toggleFavorite({ userId: user.id, gameId: gameData.id });
+    if (res?.isFavorite) {
+      setIsFavorite(true);
+      console.log("Juego agregado a favoritos");
+    } else {
+      setIsFavorite(false);
+      console.log("Juego eliminado de favoritos");
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   const handleScoreChange = (score) => {
     setReviewData({ ...reviewData, score });
@@ -162,11 +188,12 @@ const GameDetails = () => {
   {reviewsState === "success" &&
     reviewsData.map((review) => (
       <Review
-        key={review.id}
+        key={review._id}
         username={review.userId.username}
         content={review.content}
         rating={review.rating}
-        onDelete={() => console.log(`Eliminar reseña con id: ${review.id}`)}
+        onDelete={() => handleDelete(review._id)}
+
       />
     ))}
 </div>
@@ -213,7 +240,45 @@ const GameDetails = () => {
             onChange={handleReviewChange}
           ></textarea>
 
-          <button onClick={postReview}>¡Publicar!</button>
+          <button
+            className={`favorite-toggle ${reviewData.addToFavorites ? "active" : ""}`}
+            onClick={() =>
+              setReviewData({
+                ...reviewData,
+                addToFavorites: !reviewData.addToFavorites,
+              })
+            }
+          >
+            {reviewData.addToFavorites ? "Quitar de favoritos" : "Agregar a favoritos"}
+            <i
+            className={`fa${isFavorite ? "s" : "r"} fa-heart`}
+            style={{ color: isFavorite ? "red" : "white" }}
+          ></i>
+          </button>
+
+
+<button
+  onClick={async () => {
+    try {
+      const newPost = await postReview(); // ← ahora tenés el post creado
+      getReviews();
+
+      if (reviewData.addToFavorites && newPost?._id) {
+        const res = await toggleFavorite({
+          userId: user.id,
+          postId: newPost._id, // ← asegurado y directo
+        });
+        setIsFavorite(res.isFavorite);
+      }
+
+      setIsOpen(false);
+    } catch (err) {
+      console.error("Error al postear o marcar favorito:", err);
+    }
+  }}
+>
+  ¡Publicar!
+</button>
         </div>
       </Modal>
     </div>

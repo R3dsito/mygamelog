@@ -9,17 +9,18 @@ export const AuthContextProvider = ({ children }) => {
 
   const auth = Cookies.get("jwToken") || null;
 
-  useEffect(() => {
-    if (auth) {
-      const decoded = jwtDecode(auth);
-      console.log(decoded);
-      setUser({
-        name: decoded.usuario.name,
-        id: decoded.usuario._id,
-        username: decoded.usuario.username,
-      });
-    }
-  }, []);
+useEffect(() => {
+  const auth = Cookies.get("jwToken");
+  if (auth) {
+    const decoded = jwtDecode(auth);
+    setUser({
+      name: decoded.usuario.name,
+      id: decoded.usuario._id,
+      username: decoded.usuario.username,
+    });
+  }
+}, [Cookies.get("jwToken")]); // aunque cookies no sea reactiva, podrías usar otra señal
+
 
   const logoutUser = () => {
     setUser(null);

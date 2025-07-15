@@ -58,6 +58,8 @@ export const showPostsById = async (req, res) => {
   }
 };
 
+
+
 export const getLatestPosts = async (req, res) => {
   try {
     const posts = await Post.find()

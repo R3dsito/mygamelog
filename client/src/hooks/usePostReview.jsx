@@ -31,8 +31,11 @@ const usePostReview = ({
       const data = response.data;
 
       setPostReviewData({ state: "success", data, error: null });
+
+      return data; // ✅ Devuelve el post creado, incluyendo el _id
     } catch (error) {
       setPostReviewData({ state: "error", data: null, error });
+      throw error; // 🔴 Opcional: permite manejar el error fuera
     }
   };
 

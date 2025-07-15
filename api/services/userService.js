@@ -12,3 +12,11 @@ export const loginUser = async (userData) => {
   const response = await axios.post(`${API_URL}/login`, userData);
   return response.data;
 };
+
+export const followUser = async (targetId, currentUserId) => {
+  return axios.post(`${API_URL}/${targetId}/follow`, { userId: currentUserId });
+};
+
+export const unfollowUser = async (targetId, currentUserId) => {
+  return axios.post(`${API_URL}/${targetId}/unfollow`, { userId: currentUserId });
+};

@@ -36,6 +36,9 @@
         text-decoration: none;
         text-transform: uppercase;
     }
+    & ul li a:hover {
+        opacity: 75%;
+    }
 
     & ul li a i,
     & ul li button i {

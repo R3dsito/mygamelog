@@ -26,7 +26,8 @@ const App = () => {
           <Route path="/game-details" element={<GameDetails />} />
 
           <Route element={<Protected />}>
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/:id" element={<Profile />} />
+          <Route path="/profile/username/:username" element={<Profile />} />
           </Route>
         </Routes>
       </div>

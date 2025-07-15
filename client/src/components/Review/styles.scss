@@ -5,9 +5,15 @@
     max-height: 250px;
     overflow: hidden;
 
+    &__image-container {
+        width: 230px;
+        height: 200px;
+    }
+
     &__image {
-        width: 30%;
+        width: 100%;
         height: 100%;
+        cursor: pointer;
     }
 
     &__image img {
@@ -31,6 +37,12 @@
         margin-bottom: 8px;
     }
 
+    
+    &__content h4:hover {
+        cursor: pointer;
+        opacity: 75%;
+    }
+
     &__content p {
         flex: 1;
         font-size: 14px;
@@ -43,6 +55,9 @@
     }
 
 
+    &__content span{
+        cursor: default;
+    }
 
     &__content span i,
     &__content div button i {

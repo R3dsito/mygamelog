@@ -27,7 +27,7 @@ const Navbar = () => {
         
         {user ? (
           <li>
-          <NavLink to="/profile">
+          <NavLink to={`/profile/username/${user.username}`}>
             <i className="fa-solid fa-user"></i>{user.username}
           </NavLink>
         </li>
