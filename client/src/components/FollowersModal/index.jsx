@@ -6,7 +6,7 @@ const FollowersModal = ({ followers, onClose }) => {
         <button onClick={onClose}>Cerrar</button>
         <ul>
           {followers.map((follower) => (
-            <li key={follower._id}>{follower.username}</li>
+            <li key={follower._id}>{follower.imagen}{follower.username}</li>
           ))}
         </ul>
       </div>

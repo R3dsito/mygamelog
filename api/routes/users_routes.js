@@ -4,6 +4,9 @@ import { getUsers, getUser, getUserByUsername, registerUser, loginUser, followUs
     toggleFavorite,
   getFavorites } from '../controllers/users_controller.js';
 import { verificarToken } from '../middlewares/auth.js';
+import { upload } from "../middlewares/uploadImages.js";
+import { updateProfileImage } from "../controllers/users_controller.js";
+
 const userRoutes = express.Router();
 
 // get all users
@@ -16,7 +19,11 @@ userRoutes.post('/register', registerUser);
 
 // login user
 userRoutes.post('/login', loginUser);
-
+userRoutes.post(
+  "/upload-profile-image/:userId",
+  upload.single("profileImage"),
+  updateProfileImage
+);
 userRoutes.post('/follow/:id',  followUser);
 userRoutes.post('/unfollow/:id',  unfollowUser);
 userRoutes.post('/favorites', toggleFavorite);

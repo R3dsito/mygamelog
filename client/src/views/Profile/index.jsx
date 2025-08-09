@@ -128,6 +128,27 @@ const handleToggleFavorite = async (postId) => {
   }
 };
 
+const handleImageUpload = async (e) => {
+  const formData = new FormData();
+  formData.append("profileImage", e.target.files[0]);
+
+  try {
+    const res = await axios.post(
+      `http://localhost:3000/users/upload-profile-image/${loggedInUser?.id}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    console.log(res.data.imageUrl);
+  } catch (err) {
+    console.error("Error al subir imagen:", err);
+  }
+};
+
+
   const isMyProfile = loggedInUser?.id === (userIdFromUrl || userData?._id);
   
   useEffect(() => {
@@ -152,12 +173,16 @@ const handleToggleFavorite = async (postId) => {
           }}
         >
           <div>
-            <img src={PROFILE_PICTURE} />
+            <img src={userData?.imagen
+      ? `http://localhost:3000/${userData.imagen}`
+      : PROFILE_PICTURE} />
           </div>
         </div>
 
 <div className="profile__header__data">
   <h2>{userData?.username ?? "-"}</h2>
+  
+<input type="file" onChange={handleImageUpload} />
 
   <div>
     <div>
@@ -246,9 +271,13 @@ const handleToggleFavorite = async (postId) => {
   >
     {userData?.followers?.length > 0 ? (
       <ul>
-        {userData.followers.map((follower) => (
-          <Link to={`/profile/username/${follower.username}`} onClick={() => setIsOpen(false)}>
-          <li className="modal__followers" key={follower._id}>{follower.username}</li>
+        {userData.followers.map((user) => (
+          <Link to={`/profile/username/${user.username}`} onClick={() => setIsOpen(false)}>
+          <li className="modal__followers" key={user._id}><div>
+            <img src={user.imagen
+      ? `http://localhost:3000/${user.imagen}`
+      : PROFILE_PICTURE} />
+          </div>{user.username}</li>
           </Link>
         ))}
       </ul>
@@ -268,7 +297,11 @@ const handleToggleFavorite = async (postId) => {
       <ul>
         {userData.following.map((user) => (
           <Link to={`/profile/username/${user.username}`} onClick={() => setIsOpen(false)}>
-  <li className="modal__followers" key={user._id}>{user.username}</li>
+  <li className="modal__followers" key={user._id}><div>
+            <img src={user.imagen
+      ? `http://localhost:3000/${user.imagen}`
+      : PROFILE_PICTURE} />
+          </div>{user.username}</li>
 </Link>
         ))}
       </ul>

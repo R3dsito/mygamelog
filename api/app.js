@@ -25,7 +25,7 @@ app.use(express.urlencoded({extended:true}));
 app.get('/',(req, res) => {
     res.send("kanban database");
 });
-
+app.use("/uploads", express.static("uploads"));
 app.use('/posts' , postRoutes)
 app.use('/games', gameRoutes);
 app.use('/users', userRoutes);

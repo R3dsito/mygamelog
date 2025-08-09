@@ -16,8 +16,8 @@ const getUsers = async (req, res) => {
 const getUser = async (req, res) => {
   try {
     let usuario = await Users.findById(req.params.userId)
-      .populate("followers", "_id username") // Popula los seguidores con sus IDs y usernames
-      .populate("following", "_id username")
+      .populate("followers", "_id username imagen") // Popula los seguidores con sus IDs y usernames
+      .populate("following", "_id username imagen")
       .select("-password") // Excluye la contraseña
       .lean(); // Convierte el documento de Mongoose en un objeto plano
 
@@ -40,8 +40,8 @@ const getUserByUsername = async (req, res) => {
     const username = req.params.username.toLowerCase();
 
     const user = await Users.findOne({ username })
-      .populate("followers", "_id username") // Popula los seguidores con sus IDs y usernames
-      .populate("following", "_id username")
+      .populate("followers", "_id username imagen") // Popula los seguidores con sus IDs y usernames
+      .populate("following", "_id username imagen")
       .select("-password")
       .lean();
 
@@ -106,6 +106,25 @@ const loginUser = async (req, res) => {
         res.status(400).json({ error: 'ok', msj: 'server error' + err });
     }
 };
+
+const updateProfileImage = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const imagePath = req.file.path; // ruta relativa al archivo guardado
+
+    const user = await Users.findById(userId);
+    if (!user) return res.status(404).json({ message: "Usuario no encontrado" });
+
+    user.imagen = imagePath;
+    await user.save();
+
+    res.json({ message: "Imagen actualizada", imageUrl: imagePath });
+  } catch (error) {
+    console.error("Error al subir imagen:", error);
+    res.status(500).json({ message: "Error al subir la imagen" });
+  }
+};
+
 
 const followUser = async (req, res) => {
   try {
@@ -214,6 +233,7 @@ export {
     getUserByUsername,
     registerUser,
     loginUser,
+    updateProfileImage,
     followUser,
     unfollowUser,
     toggleFavorite,
