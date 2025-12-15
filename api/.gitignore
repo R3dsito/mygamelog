@@ -1,7 +1,7 @@
 # ========================================
 # ARCHIVOS DE ENTORNO
 # ========================================
-.env
+
 .env.local
 .env.*.local
 .env.development
