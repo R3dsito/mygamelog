@@ -12,7 +12,7 @@ const useGetReviews = ({ value }) => {
     setGetReviewsData({ state: "loading", data: null, error: null });
 
     try {
-      const response = await axios.get(`http://localhost:3000/posts/${value}`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/posts/${value}`);
 
       const data = response.data;
 

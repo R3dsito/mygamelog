@@ -12,7 +12,7 @@ const useGetGames = ({ value }) => {
     setGetGamesData({ state: "loading", data: null, error: null });
 
     try {
-      const response = await axios.get("http://localhost:3000/games/search", {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/games/search`, {
         params: { search: value },
       });
 

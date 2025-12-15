@@ -13,7 +13,7 @@ const useRegister = () => {
 
     try {
       const response = await axios.post(
-        `http://localhost:3000/users/register`, userData
+        `${import.meta.env.VITE_API_URL}/users/register`, userData
       );
 
       const data = response.data;

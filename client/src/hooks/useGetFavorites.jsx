@@ -9,7 +9,7 @@ const useGetFavorites = () => {
   const getFavorites = async (userId) => {
     setState("loading");
     try {
-      const response = await axios.get(`http://localhost:3000/users/favorites/${userId}`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/users/favorites/${userId}`);
       console.log("Response from getFavorites:", response.data);
       setData(response.data);
       setState("success");

@@ -12,7 +12,7 @@ const useGetUserByUsername = (username) => {
     setGetUserData({ state: "loading", data: null, error: null });
 
     try {
-      const response = await axios.get(`http://localhost:3000/users/find/username/${username}`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/users/find/username/${username}`);
       const data = response.data;
 
       setGetUserData({ state: "success", data: data, error: null });

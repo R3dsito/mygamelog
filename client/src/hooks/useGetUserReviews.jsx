@@ -13,7 +13,7 @@ const useGetUserReviews = ({ value }) => {
 
     try {
       const response = await axios.get(
-        `http://localhost:3000/posts/user/${value}`
+        `${import.meta.env.VITE_API_URL}/posts/user/${value}`
       );
 
       const data = response.data;

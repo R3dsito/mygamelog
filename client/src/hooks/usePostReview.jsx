@@ -19,7 +19,7 @@ const usePostReview = ({
     setPostReviewData({ state: "loading", data: null, error: null });
 
     try {
-      const response = await axios.post(`http://localhost:3000/posts`, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/posts`, {
         userId,
         gameId,
         imageUrl,

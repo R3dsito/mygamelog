@@ -93,8 +93,8 @@ console.log("favoritesState", favoritesState);
   const handleFollowToggle = async () => {
     try {
       const endpoint = isFollowing
-        ? `http://localhost:3000/users/unfollow/${userIdFromUrl || userData?._id}`
-        : `http://localhost:3000/users/follow/${userIdFromUrl || userData?._id}`;
+        ? `${import.meta.env.VITE_API_URL}/users/unfollow/${userIdFromUrl || userData?._id}`
+        : `${import.meta.env.VITE_API_URL}/users/follow/${userIdFromUrl || userData?._id}`;
 
 
     await axios.post(endpoint, { userId: loggedInUser?.id });
@@ -134,7 +134,7 @@ const handleImageUpload = async (e) => {
 
   try {
     const res = await axios.post(
-      `http://localhost:3000/users/upload-profile-image/${loggedInUser?.id}`,
+      `${import.meta.env.VITE_API_URL}/users/upload-profile-image/${loggedInUser?.id}`,
       formData,
       {
         headers: {
@@ -174,7 +174,7 @@ const handleImageUpload = async (e) => {
         >
           <div>
             <img src={userData?.imagen
-      ? `http://localhost:3000/${userData.imagen}`
+      ? `${import.meta.env.VITE_API_URL}/${userData.imagen}`
       : PROFILE_PICTURE} />
           </div>
         </div>
@@ -275,7 +275,7 @@ const handleImageUpload = async (e) => {
           <Link to={`/profile/username/${user.username}`} onClick={() => setIsOpen(false)}>
           <li className="modal__followers" key={user._id}><div>
             <img src={user.imagen
-      ? `http://localhost:3000/${user.imagen}`
+      ? `${import.meta.env.VITE_API_URL}/${user.imagen}`
       : PROFILE_PICTURE} />
           </div>{user.username}</li>
           </Link>
@@ -299,7 +299,7 @@ const handleImageUpload = async (e) => {
           <Link to={`/profile/username/${user.username}`} onClick={() => setIsOpen(false)}>
   <li className="modal__followers" key={user._id}><div>
             <img src={user.imagen
-      ? `http://localhost:3000/${user.imagen}`
+      ? `${import.meta.env.VITE_API_URL}/${user.imagen}`
       : PROFILE_PICTURE} />
           </div>{user.username}</li>
 </Link>

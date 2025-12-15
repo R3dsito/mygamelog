@@ -25,7 +25,7 @@ const toggleFavorite = async (e) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:3000/users/favorite",
+      `${import.meta.env.VITE_API_URL}/users/favorite`,
       {
         userId: user.id,
         postId: id,

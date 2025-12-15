@@ -13,7 +13,7 @@ const useDeleteReview = () => {
 
     try {
       const response = await axios.delete(
-        `http://localhost:3000/posts/${reviewId}`
+        `${import.meta.env.VITE_API_URL}/posts/${reviewId}`
       );
       const data = response.data;
 

@@ -13,7 +13,7 @@ const useGetUser = (userId) => {
 
     try {
       console.log(`Buscando usuario con ID: ${userId}`);
-      const response = await axios.get(`http://localhost:3000/users/find/${userId}`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/users/find/${userId}`);
       console.log("Respuesta del servidor:", response.data);
 
       const data = response.data;

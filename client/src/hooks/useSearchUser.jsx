@@ -12,7 +12,7 @@ const useSearchUser = () => {
     setSearchState({ state: "loading", data: null, error: null });
 
     try {
-      const response = await axios.get(`http://localhost:3000/users/username/${username}`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/users/username/${username}`);
       setSearchState({ state: "success", data: response.data, error: null });
     } catch (error) {
       setSearchState({ state: "error", data: null, error });

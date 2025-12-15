@@ -10,7 +10,7 @@ const toggleFavorite = async ({ userId, postId }) => {
   setError(null);
 
   try {
-    const res = await axios.post("http://localhost:3000/users/favorites", { userId, postId });
+    const res = await axios.post(`${import.meta.env.VITE_API_URL}/users/favorites`, { userId, postId });
     console.log(res.data.message);
     setLoading(false);
     return res.data;

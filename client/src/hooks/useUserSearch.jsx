@@ -13,7 +13,7 @@ const UserSearch = () => {
 
     setIsSearching(true);
     try {
-      const response = await axios.get(`http://localhost:3000/users/search?query=${query}`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/users/search?query=${query}`);
       setResults(response.data); // Asegurate de que sea un array de usuarios
     } catch (error) {
       console.error("Error al buscar usuarios:", error);

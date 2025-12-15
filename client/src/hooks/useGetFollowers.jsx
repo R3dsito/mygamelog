@@ -16,7 +16,7 @@ const useGetFollowers = ({ userId }) => {
     try {
       const token = cookies.get("jwtToken");
 
-      const response = await axios.get(`http://localhost:3000/users/${userId}/followers`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/users/${userId}/followers`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
