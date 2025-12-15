@@ -3,9 +3,8 @@ import path from "path";
 import fs from "fs";
 
 // Asegurarse de que el directorio exista
-const uploadDir = "./uploads/profile_images";
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+if (process.env.NODE_ENV !== "production") {
+  fs.mkdirSync("./uploads/profile_images", { recursive: true });
 }
 
 // Configuración del almacenamiento
