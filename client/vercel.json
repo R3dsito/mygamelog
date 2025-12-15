@@ -4,6 +4,8 @@
     { "source": "/login", "destination": "/index.html" },
     { "source": "/register", "destination": "/index.html" },
     { "source": "/profile", "destination": "/index.html" },
-    { "source": "/game-details", "destination": "/index.html" }
+    { "source": "/profile/(.*)", "destination": "/index.html" },
+    { "source": "/game-details", "destination": "/index.html" },
+    { "source": "/game-details/(.*)", "destination": "/index.html" }
   ]
 }
