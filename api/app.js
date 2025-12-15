@@ -3,18 +3,27 @@ import mongoose from 'mongoose';
 import { userRoutes, projectroutes, taskroutes, gameRoutes, postRoutes } from './routes/index.js';
 import 'dotenv/config';
 import cors from "cors"
+import { connectDB } from "./db/mongoose.js";
 
 
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB conectado'))
-  .catch(err => console.error('No se pudo conectar con MongoDB..', err));
+// mongoose.connect(process.env.MONGO_URI)
+//   .then(() => console.log('MongoDB conectado'))
+//   .catch(err => console.error('No se pudo conectar con MongoDB..', err));
 
 const app = express();
 
 
 app.use(cors());
 
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 
 
 app.use(express.json());
