@@ -2,18 +2,12 @@
 // import path from "path";
 // import fs from "fs";
 
-<<<<<<< HEAD
-// Asegurarse de que el directorio exista
-if (process.env.NODE_ENV !== "production") {
-  fs.mkdirSync("./uploads/profile_images", { recursive: true });
-}
-=======
 // // Asegurarse de que el directorio exista
 // const uploadDir = "./uploads/profile_images";
 // if (!fs.existsSync(uploadDir)) {
 //   fs.mkdirSync(uploadDir, { recursive: true });
 // }
->>>>>>> abce68d937264be35b675835766a2356433b5af4
+
 
 // // Configuración del almacenamiento
 // const storage = multer.diskStorage({
