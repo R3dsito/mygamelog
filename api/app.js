@@ -4,14 +4,11 @@ import { userRoutes, projectroutes, taskroutes, gameRoutes, postRoutes } from '.
 import 'dotenv/config';
 import cors from "cors"
 
-mongoose.connect("mongodb://127.0.0.1:27017/kanban", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-    .then(() => {console.log('Conectado a MongoDB...')
-})
-    .catch(err => console.log('No se pudo conectar con MongoDB..', err));
 
+
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('MongoDB conectado'))
+  .catch(err => console.error('No se pudo conectar con MongoDB..', err));
 
 const app = express();
 
@@ -32,6 +29,6 @@ app.use('/users', userRoutes);
 app.use('/projects', projectroutes);
 app.use('/tasks', taskroutes);
 
-const port = process.env.PORT || 3002;
-app.listen(port, () => {
-   })
+// const port = process.env.PORT || 3002;
+// app.listen(port, () => {
+//    })

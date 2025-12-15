@@ -1,24 +1,55 @@
-# Logs
-logs
-*.log
+# ========================================
+# ARCHIVOS DE ENTORNO
+# ========================================
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.test
+
+# ========================================
+# DEPENDENCIAS
+# ========================================
+node_modules/
+vendor/
+
+# ========================================
+# CACHE Y LOGS
+# ========================================
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
+composer.lock
+package-lock.json
+.pnpm-debug.log
 
-node_modules
-dist
-dist-ssr
-*.local
+storage/*.key
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/logs/*
+bootstrap/cache/*
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# ========================================
+# SISTEMA OPERATIVO
+# ========================================
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+Thumbs.db
+
+# ========================================
+# IDEs Y EDITORES
+# ========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ========================================
+# COMPILADOS Y BUILD
+# ========================================
+dist/
+build/
+public/hot
+public/storage
