@@ -34,7 +34,7 @@ const Navbar = () => {
         ) : (
           <li>
           <NavLink to="/profile">
-            <i className="fa-solid fa-user"></i>Perfil 
+            {/* <i className="fa-solid fa-user"></i>Perfil  */}
           </NavLink>
         </li>
         )}
