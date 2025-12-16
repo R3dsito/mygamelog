@@ -134,7 +134,7 @@ const handleImageUpload = async (e) => {
 
   try {
     const res = await axios.post(
-      `${import.meta.env.VITE_API_URL}/api/users/upload-profile-image/${loggedInUser.id}`,
+      `${import.meta.env.VITE_API_URL}/users/upload-profile-image/${loggedInUser.id}`,
       formData,
       {
         headers: {
@@ -148,7 +148,6 @@ const handleImageUpload = async (e) => {
     console.error("Error al subir imagen:", err);
   }
 };
-
 
 
 
