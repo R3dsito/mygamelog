@@ -31,14 +31,14 @@ app.use(express.urlencoded({extended:true}));
 app.get('/',(req, res) => {
     res.send("kanban database");
 });
-// app.use("/uploads", express.static("uploads"));
+app.use("/uploads", express.static("uploads"));
 app.use('/posts' , postRoutes)
 app.use('/games', gameRoutes);
 app.use('/users', userRoutes);
 app.use('/projects', projectroutes);
 app.use('/tasks', taskroutes);
-export default app;
+// export default app;
 
-// const port = process.env.PORT || 3002;
-// app.listen(port, () => {
-//    })
+ const port = process.env.PORT || 3002;
+ app.listen(port, () => {
+    })

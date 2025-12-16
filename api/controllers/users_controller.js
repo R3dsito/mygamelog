@@ -2,7 +2,8 @@ import Users from '../models/users_model.js';
 import bcrypt from "bcrypt";
 import 'dotenv/config';
 import jwt from 'jsonwebtoken';
-import Posts from "../models/Post.js"; // Asegurate de importar tu modelo de Posts
+import Posts from "../models/Post.js";
+import cloudinary from "../config/cloudinary.js";
 // Obtener todos los usuarios
 const getUsers = async (req, res) => {
     try {
@@ -16,9 +17,9 @@ const getUsers = async (req, res) => {
 const getUser = async (req, res) => {
   try {
     let usuario = await Users.findById(req.params.userId)
-      .populate("followers", "_id username imagen") // Popula los seguidores con sus IDs y usernames
+      .populate("followers", "_id username imagen")
       .populate("following", "_id username imagen")
-      .select("-password") // Excluye la contraseña
+      .select("-password")
       .lean(); // Convierte el documento de Mongoose en un objeto plano
 
     if (!usuario) {
@@ -109,21 +110,36 @@ const loginUser = async (req, res) => {
 
 const updateProfileImage = async (req, res) => {
   try {
-    const userId = req.params.userId;
-    const imagePath = req.file.path; // ruta relativa al archivo guardado
+    const { userId } = req.params;
 
-    const user = await Users.findById(userId);
-    if (!user) return res.status(404).json({ message: "Usuario no encontrado" });
+    if (!req.file) {
+      return res.status(400).json({ error: "No image provided" });
+    }
 
-    user.imagen = imagePath;
-    await user.save();
+    const result = await cloudinary.uploader.upload(
+      `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
+      {
+        folder: "profile_images",
+      }
+    );
 
-    res.json({ message: "Imagen actualizada", imageUrl: imagePath });
+    const user = await Users.findByIdAndUpdate(
+      userId,
+      { imagen: result.secure_url },
+      { new: true }
+    ).select("-password");
+
+    res.json({
+      message: "Imagen actualizada",
+      imageUrl: result.secure_url,
+      user,
+    });
   } catch (error) {
-    console.error("Error al subir imagen:", error);
-    res.status(500).json({ message: "Error al subir la imagen" });
+    console.error(error);
+    res.status(500).json({ error: "Upload failed" });
   }
 };
+
 
 
 const followUser = async (req, res) => {
