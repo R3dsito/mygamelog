@@ -134,19 +134,22 @@ const handleImageUpload = async (e) => {
 
   try {
     const res = await axios.post(
-      `${import.meta.env.VITE_API_URL}/users/upload-profile-image/${loggedInUser?.id}`,
+      `${import.meta.env.VITE_API_URL}/users/upload-profile-image/${loggedInUser.id}`,
       formData,
       {
         headers: {
-          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       }
     );
-    console.log(res.data.imageUrl);
+
+    console.log("Imagen subida:", res.data.imageUrl);
   } catch (err) {
     console.error("Error al subir imagen:", err);
   }
 };
+
+
 
 
   const isMyProfile = loggedInUser?.id === (userIdFromUrl || userData?._id);
@@ -173,9 +176,11 @@ const handleImageUpload = async (e) => {
           }}
         >
           <div>
-            <img src={userData?.imagen
-      ? `${import.meta.env.VITE_API_URL}/${userData.imagen}`
-      : PROFILE_PICTURE} />
+              <img
+      src={userData?.imagen || PROFILE_PICTURE}
+      alt="Profile"
+    />
+
           </div>
         </div>
 
@@ -274,9 +279,10 @@ const handleImageUpload = async (e) => {
         {userData.followers.map((user) => (
           <Link to={`/profile/username/${user.username}`} onClick={() => setIsOpen(false)}>
           <li className="modal__followers" key={user._id}><div>
-            <img src={user.imagen
-      ? `${import.meta.env.VITE_API_URL}/${user.imagen}`
-      : PROFILE_PICTURE} />
+            <img
+  src={user.imagen || PROFILE_PICTURE}
+  alt="Profile"
+/>
           </div>{user.username}</li>
           </Link>
         ))}
@@ -298,9 +304,10 @@ const handleImageUpload = async (e) => {
         {userData.following.map((user) => (
           <Link to={`/profile/username/${user.username}`} onClick={() => setIsOpen(false)}>
   <li className="modal__followers" key={user._id}><div>
-            <img src={user.imagen
-      ? `${import.meta.env.VITE_API_URL}/${user.imagen}`
-      : PROFILE_PICTURE} />
+            <img
+  src={user.imagen || PROFILE_PICTURE}
+  alt="Profile"
+/>
           </div>{user.username}</li>
 </Link>
         ))}
