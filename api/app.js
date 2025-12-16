@@ -37,8 +37,8 @@ app.use('/games', gameRoutes);
 app.use('/users', userRoutes);
 app.use('/projects', projectroutes);
 app.use('/tasks', taskroutes);
-// export default app;
+export default app;
 
- const port = process.env.PORT || 3002;
- app.listen(port, () => {
-    })
+//  const port = process.env.PORT || 3002;
+//  app.listen(port, () => {
+//     })

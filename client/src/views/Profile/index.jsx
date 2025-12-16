@@ -176,10 +176,10 @@ const handleImageUpload = async (e) => {
           }}
         >
           <div>
-            <img
-    src={userData?.imagen || PROFILE_PICTURE}
-    alt="Profile"
-  />
+              <img
+      src={userData?.imagen || PROFILE_PICTURE}
+      alt="Profile"
+    />
 
           </div>
         </div>
