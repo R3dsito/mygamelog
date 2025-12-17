@@ -25,10 +25,16 @@ const Profile = () => {
 const [showFollowersModal, setShowFollowersModal] = useState(false);
 const [showFollowingModal, setShowFollowingModal] = useState(false);
 const { state: favoritesState, data: favoritesData, error: favoritesError, getFavorites } = useGetFavorites();
-console.log("favoritesData", favoritesData);
-console.log("favoritesState", favoritesState);
 
-  const { deleteReview } = useDeleteReview();
+const [showEditModal, setShowEditModal] = useState(false);
+
+const { deleteReview } = useDeleteReview();
+
+const [editData, setEditData] = useState({
+  name: "",
+  username: "",
+  email: "",
+});
 
 
   const {
@@ -187,7 +193,12 @@ const handleImageUpload = async (e) => {
 <div className="profile__header__data">
   <h2>{userData?.username ?? "-"}</h2>
   
-<input type="file" onChange={handleImageUpload} />
+{/* <input type="file" onChange={handleImageUpload} /> */}
+{isMyProfile && (
+  <button onClick={() => setShowEditModal(true)}>
+    Editar perfil
+  </button>
+)}
 
   <div>
     <div>
@@ -317,6 +328,58 @@ const handleImageUpload = async (e) => {
     )}
   </Modal>
 )}
+
+{showEditModal && (
+  <Modal
+    isOpen={showEditModal}
+    setIsOpen={setShowEditModal}
+    title="Editar perfil"
+  >
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleUpdateProfile();
+      }}
+      className="register"
+    >
+      <input
+        placeholder="Nombre"
+        type="text"
+        value={editData.name}
+        onChange={(e) =>
+          setEditData({ ...editData, name: e.target.value })
+        }
+      />
+
+      <input
+        placeholder="Username"
+        type="text"
+        value={editData.username}
+        onChange={(e) =>
+          setEditData({ ...editData, username: e.target.value })
+        }
+      />
+
+      <input
+        placeholder="Email"
+        type="email"
+        value={editData.email}
+        onChange={(e) =>
+          setEditData({ ...editData, email: e.target.value })
+        }
+      />
+
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleImageUpload}
+      />
+
+      <button type="submit">Guardar cambios</button>
+    </form>
+  </Modal>
+)}
+
 
     </div>
     

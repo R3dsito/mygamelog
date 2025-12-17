@@ -108,6 +108,40 @@ const loginUser = async (req, res) => {
     }
 };
 
+const searchUsers = async (req, res) => {
+  try {
+    const { q } = req.query;
+
+    if (!q) {
+      return res.status(400).json({ message: "Query requerida" });
+    }
+
+    const users = await Users.find({
+      username: { $regex: q, $options: "i" }
+    })
+      .select("_id username imagen")
+      .limit(10);
+
+    res.json(users);
+  } catch (error) {
+    console.error("Error searchUsers:", error);
+    res.status(500).json({ message: "Error del servidor" });
+  }
+};
+
+const updateUser = async (req, res) => {
+  const { name, username, email } = req.body;
+
+  const user = await Users.findByIdAndUpdate(
+    req.params.userId,
+    { name, username, email },
+    { new: true }
+  ).select("-password");
+
+  res.json(user);
+};
+
+
 const updateProfileImage = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -249,6 +283,8 @@ export {
     getUserByUsername,
     registerUser,
     loginUser,
+    searchUsers,
+    updateUser,
     updateProfileImage,
     followUser,
     unfollowUser,

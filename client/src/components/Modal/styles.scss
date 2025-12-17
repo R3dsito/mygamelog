@@ -15,6 +15,7 @@
     }
 }
 
+
 .modal {
     position: relative;
     top: -10%;
@@ -83,6 +84,48 @@
     & a:hover{
         cursor: pointer;
         
+    }
+    & form {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    & input {
+        width: 100%;
+        background-color: unset;
+        border: 2px solid wheat;
+        border-radius: 25px;
+        padding: 8px 16px;
+        margin-bottom: 16px;
+    }
+
+    & input::placeholder {
+        color: wheat;
+    }
+
+    & input:focus {
+        outline: none;
+    }
+
+
+    & button {
+        width: 100%;
+        background-color: wheat;
+        color: #021603f6;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        font-weight: 600;
+        padding: 4px 16px;
+        border-radius: 25px;
+        transition: .5s;
+    }
+
+    & button:hover {
+        background-color: rgba(245, 222, 179, .80);
     }
 }
 

@@ -1,5 +1,5 @@
 import express  from 'express';
-import { getUsers, getUser, getUserByUsername, registerUser, loginUser, followUser,
+import { getUsers, getUser, getUserByUsername, registerUser, loginUser, updateUser, searchUsers, followUser,
     unfollowUser,
     toggleFavorite,
   getFavorites } from '../controllers/users_controller.js';
@@ -24,6 +24,8 @@ userRoutes.post('/login', loginUser);
    upload.single("profileImage"),
    updateProfileImage
  );
+ userRoutes.get("/search", searchUsers);
+ userRoutes.put("/update/:userId", verificarToken, updateUser);
 userRoutes.post('/follow/:id',  followUser);
 userRoutes.post('/unfollow/:id',  unfollowUser);
 userRoutes.post('/favorites', toggleFavorite);
