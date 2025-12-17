@@ -155,6 +155,29 @@ const handleImageUpload = async (e) => {
   }
 };
 
+// const handleUpdateProfile = async () => {
+//   try {
+//     await axios.put(
+//       `${import.meta.env.VITE_API_URL}/users/update/${loggedInUser.id}`,
+//       editData,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${localStorage.getItem("token")}`,
+//         },
+//       }
+//     );
+
+//     setShowEditModal(false);
+
+//     if (userIdFromUrl) getUser(userIdFromUrl);
+//     else if (usernameFromUrl) getUserByUsername(usernameFromUrl);
+
+//   } catch (error) {
+//     console.error("Error al actualizar perfil:", error);
+//   }
+// };
+
+
 
 
 
@@ -168,6 +191,17 @@ const handleImageUpload = async (e) => {
     setIsFollowing(isUserFollowing);
   }
 }, [userData, loggedInUser]);
+
+  const MIN_FAVORITES = 4;
+
+  const favoritesToRender =
+    favoritesState === "success" ? favoritesData : [];
+
+  const emptySlots =
+    favoritesToRender.length < MIN_FAVORITES
+      ? MIN_FAVORITES - favoritesToRender.length
+      : 0;
+
 
   if (userState === "loading") return <Loader />;
   if (userState === "error") return <p>Error al cargar el usuario: {userError?.message}</p>;
@@ -231,26 +265,38 @@ const handleImageUpload = async (e) => {
 
 <div className="profile__favorites">
   {favoritesState === "loading" && <Loader />}
+
   {favoritesError && (
     <div className="profile__error">
       <p>Error al cargar favoritos.</p>
     </div>
   )}
-  {favoritesState === "success" && favoritesData.length > 0 ? (
-    favoritesData.map((favorites) => (
-      <Favorite
-        key={favorites._id}
-        id={favorites.gameId}
-        name={favorites.gameName}
-        rating={favorites.rating}
-        image={favorites.imageUrl}
-      />
-    ))
-  ) : (
-    <p>No hay juegos favoritos aún.</p>
-  )}
-</div>
 
+  {favoritesState === "success" && (
+    <>
+      {favoritesToRender.map((fav) => (
+        <Favorite
+          key={fav._id}
+          id={fav.gameId}
+          name={fav.gameName}
+          rating={fav.rating}
+          image={fav.imageUrl}
+        />
+      ))}
+
+      {/* Slots vacíos */}
+      {Array.from({ length: emptySlots }).map((_, i) => (
+        <div key={`empty-${i}`} className="favorite favorite--empty">
+          <span>+</span>
+        </div>
+      ))}
+    </>
+  )}
+
+</div>
+  {favoritesState === "success" && favoritesToRender.length === 0 && (
+    <p className="profile_nofavorites">No hay juegos favoritos aún.</p>
+  )}
 
       <div className="profile__reviews">
         <h3>Reviews</h3>
@@ -290,7 +336,7 @@ const handleImageUpload = async (e) => {
         {userData.followers.map((user) => (
           <Link to={`/profile/username/${user.username}`} onClick={() => setIsOpen(false)}>
           <li className="modal__followers" key={user._id}><div>
-            <img
+            <img className="userImage"
   src={user.imagen || PROFILE_PICTURE}
   alt="Profile"
 />
@@ -315,7 +361,7 @@ const handleImageUpload = async (e) => {
         {userData.following.map((user) => (
           <Link to={`/profile/username/${user.username}`} onClick={() => setIsOpen(false)}>
   <li className="modal__followers" key={user._id}><div>
-            <img
+            <img className="userImage"
   src={user.imagen || PROFILE_PICTURE}
   alt="Profile"
 />
@@ -342,38 +388,20 @@ const handleImageUpload = async (e) => {
       }}
       className="register"
     >
-      <input
-        placeholder="Nombre"
-        type="text"
-        value={editData.name}
-        onChange={(e) =>
-          setEditData({ ...editData, name: e.target.value })
-        }
-      />
-
-      <input
-        placeholder="Username"
-        type="text"
-        value={editData.username}
-        onChange={(e) =>
-          setEditData({ ...editData, username: e.target.value })
-        }
-      />
-
-      <input
-        placeholder="Email"
-        type="email"
-        value={editData.email}
-        onChange={(e) =>
-          setEditData({ ...editData, email: e.target.value })
-        }
+    <label className="">
+      <img className="editImage"
+        src={userData?.imagen || PROFILE_PICTURE}
+        alt="Profile"
       />
 
       <input
         type="file"
         accept="image/*"
         onChange={handleImageUpload}
+        hidden
       />
+    </label>
+      
 
       <button type="submit">Guardar cambios</button>
     </form>

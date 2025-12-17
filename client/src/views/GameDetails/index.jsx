@@ -190,6 +190,7 @@ const handleToggleFavorite = async () => {
       <Review
         key={review._id}
         username={review.userId.username}
+        imagen={review.userId.imagen}
         content={review.content}
         rating={review.rating}
         onDelete={() => handleDelete(review._id)}
@@ -251,8 +252,7 @@ const handleToggleFavorite = async () => {
           >
             {reviewData.addToFavorites ? "Quitar de favoritos" : "Agregar a favoritos"}
             <i
-            className={`fa${isFavorite ? "s" : "r"} fa-heart`}
-            style={{ color: isFavorite ? "red" : "white" }}
+            className={`fa-${isFavorite ? "solid" : "regular"} fa-heart`}
           ></i>
           </button>
 

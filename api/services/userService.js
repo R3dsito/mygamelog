@@ -20,3 +20,11 @@ export const followUser = async (targetId, currentUserId) => {
 export const unfollowUser = async (targetId, currentUserId) => {
   return axios.post(`${API_URL}/${targetId}/unfollow`, { userId: currentUserId });
 };
+
+export const updateUser = async (userId, updateData) => {
+  const { data } = await api.put(
+    `${API_URL}/update/${userId}`,
+    updateData
+  );
+  return data;
+};

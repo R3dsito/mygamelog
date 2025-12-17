@@ -62,51 +62,77 @@ const getUserByUsername = async (req, res) => {
 };
 // Registrar usuario
 const registerUser = async (req, res) => {
-    try {
-        let body = req.body;
+  try {
+    const { name, username, email, password } = req.body;
 
-        let usuario = new Users({
-            name: body.name,
-            username: body.username.toLowerCase(),
-            email: body.email,
-            password: bcrypt.hashSync(body.password, 10)
-        });
-        let savedUser = await usuario.save();
-
-        res.json({ user: savedUser });
-    } catch (error) {
-        res.status(400).json({ message: error.message });
+    if (!name || !username || !email || !password) {
+      return res.status(400).json({ error: "Todos los campos son obligatorios" });
     }
+
+    if (password.length < 6) {
+      return res.status(400).json({ error: "La contraseña debe tener al menos 6 caracteres" });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: "Email inválido" });
+    }
+
+    let usuario = new Users({
+      name,
+      username: username.toLowerCase(),
+      email,
+      password: bcrypt.hashSync(password, 10),
+    });
+
+    let savedUser = await usuario.save();
+
+    res.json({ user: savedUser });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
 };
+
 
 // Iniciar sesión
 const loginUser = async (req, res) => {
-    try {
-        let usuario = await Users.findOne({ email: req.body.email });
-        if (!usuario) return res.status(400).json({ error: 'ok', msj: 'Wrong user or password' });
+  try {
+    const { email, password } = req.body;
 
-        const passwordValido = bcrypt.compareSync(req.body.password, usuario.password);
-        if (!passwordValido) return res.status(400).json({ error: 'ok', msj: 'Wrong user or password' });
-
-        const jwToken = jwt.sign(
-            { usuario: { _id: usuario._id, name: usuario.name, username: usuario.username, email: usuario.email } },
-            process.env.SEED,
-            { expiresIn: process.env.EXPIRATION }
-        );
-
-        res.json({
-            usuario: {
-                _id: usuario._id,
-                name: usuario.name,
-                username: usuario.username,
-                email: usuario.email
-            },
-            jwToken
-        });
-    } catch (err) {
-        res.status(400).json({ error: 'ok', msj: 'server error' + err });
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email y contraseña requeridos" });
     }
+
+    let usuario = await Users.findOne({ email });
+    if (!usuario) {
+      return res.status(400).json({ error: 'Email inválido', msj: 'Wrong user or password' });
+    }
+
+    const passwordValido = bcrypt.compareSync(password, usuario.password);
+    if (!passwordValido) {
+      return res.status(400).json({ error: 'Contraseña inválida', msj: 'Wrong user or password' });
+    }
+
+    const jwToken = jwt.sign(
+      { usuario: { _id: usuario._id, name: usuario.name, username: usuario.username, email: usuario.email } },
+      process.env.SEED,
+      { expiresIn: process.env.EXPIRATION }
+    );
+
+    res.json({
+      usuario: {
+        _id: usuario._id,
+        name: usuario.name,
+        username: usuario.username,
+        email: usuario.email
+      },
+      jwToken
+    });
+  } catch (err) {
+    res.status(400).json({ error: 'ok', msj: 'server error' + err });
+  }
 };
+
 
 const searchUsers = async (req, res) => {
   try {
