@@ -1,0 +1,37 @@
+.feed {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    padding: 32px 16px;
+
+    & > h2 {
+        margin-bottom: 8px;
+    }
+
+    &__subtitle {
+        opacity: 0.6;
+        font-size: 14px;
+        margin-bottom: 32px;
+    }
+
+    &__list {
+        width: 100%;
+        max-width: 700px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    &__empty,
+    &__error {
+        opacity: 0.6;
+        text-align: center;
+        margin-top: 16px;
+    }
+
+    &__error i {
+        display: block;
+        margin-bottom: 8px;
+    }
+}

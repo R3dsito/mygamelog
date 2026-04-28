@@ -86,8 +86,9 @@ const registerUser = async (req, res) => {
     });
 
     let savedUser = await usuario.save();
+    const { password: _, ...userData } = savedUser.toObject();
 
-    res.json({ user: savedUser });
+    res.json({ user: userData });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -156,11 +157,15 @@ const searchUsers = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  const { name, username, email } = req.body;
+  if (req.usuario._id.toString() !== req.params.userId) {
+    return res.status(403).json({ message: "No autorizado" });
+  }
+
+  const { name, username, email, bio } = req.body;
 
   const user = await Users.findByIdAndUpdate(
     req.params.userId,
-    { name, username, email },
+    { name, username, email, bio },
     { new: true }
   ).select("-password");
 
@@ -171,6 +176,10 @@ const updateUser = async (req, res) => {
 const updateProfileImage = async (req, res) => {
   try {
     const { userId } = req.params;
+
+    if (req.usuario._id.toString() !== userId) {
+      return res.status(403).json({ error: "No autorizado" });
+    }
 
     if (!req.file) {
       return res.status(400).json({ error: "No image provided" });
@@ -200,11 +209,39 @@ const updateProfileImage = async (req, res) => {
   }
 };
 
+const uploadBannerImage = async (req, res) => {
+  try {
+    const { userId } = req.params;
 
+    if (req.usuario._id.toString() !== userId) {
+      return res.status(403).json({ error: "No autorizado" });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ error: "No image provided" });
+    }
+
+    const result = await cloudinary.uploader.upload(
+      `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
+      { folder: "banner_images" }
+    );
+
+    const user = await Users.findByIdAndUpdate(
+      userId,
+      { bannerImage: result.secure_url },
+      { new: true }
+    ).select("-password");
+
+    res.json({ message: "Banner actualizado", imageUrl: result.secure_url, user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Upload failed" });
+  }
+};
 
 const followUser = async (req, res) => {
   try {
-    const userId = req.body.userId;
+    const userId = req.usuario._id.toString();
     const targetId = req.params.id;
 
     if (userId === targetId) {
@@ -236,7 +273,7 @@ const followUser = async (req, res) => {
 
 const unfollowUser = async (req, res) => {
   try {
-    const userId = req.body.userId;
+    const userId = req.usuario._id.toString();
     const targetId = req.params.id;
 
     const user = await Users.findById(userId);
@@ -260,7 +297,8 @@ const unfollowUser = async (req, res) => {
 
 const toggleFavorite = async (req, res) => {
   try {
-    const { userId, postId } = req.body; // Ahora esperamos postId
+    const userId = req.usuario._id.toString();
+    const { postId } = req.body;
 
     const user = await Users.findById(userId);
     if (!user) return res.status(404).json({ message: "Usuario no encontrado" });
@@ -312,6 +350,7 @@ export {
     searchUsers,
     updateUser,
     updateProfileImage,
+    uploadBannerImage,
     followUser,
     unfollowUser,
     toggleFavorite,

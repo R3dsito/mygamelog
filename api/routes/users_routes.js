@@ -1,11 +1,8 @@
 import express  from 'express';
 import { getUsers, getUser, getUserByUsername, registerUser, loginUser, updateUser, searchUsers, followUser,
-    unfollowUser,
-    toggleFavorite,
-  getFavorites } from '../controllers/users_controller.js';
+    unfollowUser, toggleFavorite, getFavorites, updateProfileImage, uploadBannerImage } from '../controllers/users_controller.js';
 import { verificarToken } from '../middlewares/auth.js';
- import { upload } from "../middlewares/uploadImages.js";
-import { updateProfileImage } from "../controllers/users_controller.js";
+import { upload } from "../middlewares/uploadImages.js";
 
 const userRoutes = express.Router();
 
@@ -19,16 +16,13 @@ userRoutes.post('/register', registerUser);
 
 // login user
 userRoutes.post('/login', loginUser);
- userRoutes.post(
-   "/upload-profile-image/:userId",
-   upload.single("profileImage"),
-   updateProfileImage
- );
+userRoutes.post("/upload-profile-image/:userId", verificarToken, upload.single("profileImage"), updateProfileImage);
+userRoutes.post("/upload-banner-image/:userId", verificarToken, upload.single("bannerImage"), uploadBannerImage);
  userRoutes.get("/search", searchUsers);
  userRoutes.put("/update/:userId", verificarToken, updateUser);
-userRoutes.post('/follow/:id',  followUser);
-userRoutes.post('/unfollow/:id',  unfollowUser);
-userRoutes.post('/favorites', toggleFavorite);
+userRoutes.post('/follow/:id', verificarToken, followUser);
+userRoutes.post('/unfollow/:id', verificarToken, unfollowUser);
+userRoutes.post('/favorites', verificarToken, toggleFavorite);
 userRoutes.get('/favorites/:userId', getFavorites);
 userRoutes.get('/search', async (req, res) => {
   const query = req.query.query;

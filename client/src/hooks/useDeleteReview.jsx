@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "@/api/axiosInstance";
 
 const useDeleteReview = () => {
   const [deleteReviewData, setDeleteReviewData] = useState({
@@ -12,9 +12,7 @@ const useDeleteReview = () => {
     setDeleteReviewData({ state: "loading", data: null, error: null });
 
     try {
-      const response = await axios.delete(
-        `${import.meta.env.VITE_API_URL}/posts/${reviewId}`
-      );
+      const response = await api.delete(`/posts/${reviewId}`);
       const data = response.data;
 
       setDeleteReviewData({ state: "success", data, error: null });
@@ -27,7 +25,7 @@ const useDeleteReview = () => {
     state: deleteReviewData.state,
     data: deleteReviewData.data,
     error: deleteReviewData.error,
-    deleteReview, // Retorna la función
+    deleteReview,
   };
 };
 

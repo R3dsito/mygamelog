@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "@/api/axiosInstance";
 
 const usePostReview = ({
   userId,
@@ -19,7 +19,7 @@ const usePostReview = ({
     setPostReviewData({ state: "loading", data: null, error: null });
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/posts`, {
+      const response = await api.post("/posts", {
         userId,
         gameId,
         imageUrl,

@@ -1,8 +1,8 @@
 import { useEffect, useContext, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 
 import { Favorite, Loader, Review, Modal } from "@/components";
-import axios from "axios";
+import api from "@/api/axiosInstance";
 import useGetSuggestions from "@/hooks/useGetSuggestions";
 import useGetUserReviews from "@/hooks/useGetUserReviews";
 import useDeleteReview from "@/hooks/useDeleteReview";
@@ -18,8 +18,9 @@ import useGetFavorites from "@/hooks/useGetFavorites";
 const PROFILE_PICTURE = "https://pbs.twimg.com/media/Fvpd8chWcAEPllN.jpg";
 
 const Profile = () => {
-  const { user: loggedInUser } = useContext(AuthContext);
+  const { user: loggedInUser, setUser } = useContext(AuthContext);
   const { id: userIdFromUrl, username: usernameFromUrl } = useParams();
+  const navigate = useNavigate();
   const [isFollowing, setIsFollowing] = useState(false);
 
 const [showFollowersModal, setShowFollowersModal] = useState(false);
@@ -30,11 +31,9 @@ const [showEditModal, setShowEditModal] = useState(false);
 
 const { deleteReview } = useDeleteReview();
 
-const [editData, setEditData] = useState({
-  name: "",
-  username: "",
-  email: "",
-});
+const [editData, setEditData] = useState({ name: "", username: "", email: "", bio: "" });
+const [previewAvatar, setPreviewAvatar] = useState(null);
+const [previewBanner, setPreviewBanner] = useState(null);
 
 
   const {
@@ -99,11 +98,11 @@ const [editData, setEditData] = useState({
   const handleFollowToggle = async () => {
     try {
       const endpoint = isFollowing
-        ? `${import.meta.env.VITE_API_URL}/users/unfollow/${userIdFromUrl || userData?._id}`
-        : `${import.meta.env.VITE_API_URL}/users/follow/${userIdFromUrl || userData?._id}`;
+        ? `/users/unfollow/${userIdFromUrl || userData?._id}`
+        : `/users/follow/${userIdFromUrl || userData?._id}`;
 
 
-    await axios.post(endpoint, { userId: loggedInUser?.id });
+    await api.post(endpoint, {});
     setIsFollowing(!isFollowing);
 
     if (userIdFromUrl) {
@@ -134,52 +133,62 @@ const handleToggleFavorite = async (postId) => {
   }
 };
 
-const handleImageUpload = async (e) => {
+const handleAvatarUpload = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  setPreviewAvatar(URL.createObjectURL(file));
   const formData = new FormData();
-  formData.append("profileImage", e.target.files[0]);
-
+  formData.append("profileImage", file);
   try {
-    const res = await axios.post(
-      `${import.meta.env.VITE_API_URL}/users/upload-profile-image/${loggedInUser.id}`,
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
-
-    console.log("Imagen subida:", res.data.imageUrl);
+    await api.post(`/users/upload-profile-image/${loggedInUser.id}`, formData);
   } catch (err) {
-    console.error("Error al subir imagen:", err);
+    console.error("Error al subir avatar:", err);
+    setPreviewAvatar(null);
   }
 };
 
-// const handleUpdateProfile = async () => {
-//   try {
-//     await axios.put(
-//       `${import.meta.env.VITE_API_URL}/users/update/${loggedInUser.id}`,
-//       editData,
-//       {
-//         headers: {
-//           Authorization: `Bearer ${localStorage.getItem("token")}`,
-//         },
-//       }
-//     );
+const handleBannerUpload = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  setPreviewBanner(URL.createObjectURL(file));
+  const formData = new FormData();
+  formData.append("bannerImage", file);
+  try {
+    await api.post(`/users/upload-banner-image/${loggedInUser.id}`, formData);
+  } catch (err) {
+    console.error("Error al subir banner:", err);
+    setPreviewBanner(null);
+  }
+};
 
-//     setShowEditModal(false);
+const handleUpdateProfile = async () => {
+  try {
+    await api.put(`/users/update/${loggedInUser.id}`, editData);
+    setShowEditModal(false);
+    setPreviewAvatar(null);
+    setPreviewBanner(null);
+    setUser((prev) => ({ ...prev, name: editData.name, username: editData.username }));
+    // Navegar a la nueva URL para que el componente se remonte con el username correcto
+    navigate(`/profile/username/${editData.username}`, { replace: true });
+  } catch (error) {
+    console.error("Error al actualizar perfil:", error);
+  }
+};
 
-//     if (userIdFromUrl) getUser(userIdFromUrl);
-//     else if (usernameFromUrl) getUserByUsername(usernameFromUrl);
-
-//   } catch (error) {
-//     console.error("Error al actualizar perfil:", error);
-//   }
-// };
 
 
 
 
+  useEffect(() => {
+    if (showEditModal && userData) {
+      setEditData({
+        name: userData.name || "",
+        username: userData.username || "",
+        email: userData.email || "",
+        bio: userData.bio || "",
+      });
+    }
+  }, [showEditModal]);
 
   const isMyProfile = loggedInUser?.id === (userIdFromUrl || userData?._id);
   
@@ -212,7 +221,7 @@ const handleImageUpload = async (e) => {
         <div
           className="profile__header__images"
           style={{
-            backgroundImage: `url(https://image.tensorartassets.com/cdn-cgi/image/anim=true,plain=false,w=2048,f=jpeg,q=85/posts/images/646889879699062307/8f152d51-dd42-404f-898d-8a1c38f12a6b.jpg)`,
+            backgroundImage: `url(${userData?.bannerImage || "https://image.tensorartassets.com/cdn-cgi/image/anim=true,plain=false,w=2048,f=jpeg,q=85/posts/images/646889879699062307/8f152d51-dd42-404f-898d-8a1c38f12a6b.jpg"})`,
           }}
         >
           <div>
@@ -226,8 +235,8 @@ const handleImageUpload = async (e) => {
 
 <div className="profile__header__data">
   <h2>{userData?.username ?? "-"}</h2>
-  
-{/* <input type="file" onChange={handleImageUpload} /> */}
+  {userData?.bio && <p className="profile__bio">{userData.bio}</p>}
+
 {isMyProfile && (
   <button onClick={() => setShowEditModal(true)}>
     Editar perfil
@@ -317,7 +326,8 @@ const handleImageUpload = async (e) => {
                 gameName={review.gameName}
                 content={review.content}
                 rating={review.rating}
-                
+                postId={review._id}
+                likes={review.likes || []}
                 onDelete={
                   isMyProfile ? () => handleDelete(review._id) : undefined
                 }
@@ -382,28 +392,61 @@ const handleImageUpload = async (e) => {
     title="Editar perfil"
   >
     <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        handleUpdateProfile();
-      }}
-      className="register"
+      onSubmit={(e) => { e.preventDefault(); handleUpdateProfile(); }}
+      className="edit-profile"
     >
-    <label className="">
-      <img className="editImage"
-        src={userData?.imagen || PROFILE_PICTURE}
-        alt="Profile"
-      />
+      {/* Banner */}
+      <div className="edit-profile__banner">
+        <img
+          src={previewBanner || userData?.bannerImage || "https://image.tensorartassets.com/cdn-cgi/image/anim=true,plain=false,w=2048,f=jpeg,q=85/posts/images/646889879699062307/8f152d51-dd42-404f-898d-8a1c38f12a6b.jpg"}
+          alt="Banner"
+        />
+        <label className="edit-profile__overlay">
+          <i className="fa-solid fa-camera"></i>
+          <input type="file" accept="image/*" hidden onChange={handleBannerUpload} />
+        </label>
+      </div>
 
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleImageUpload}
-        hidden
-      />
-    </label>
-      
+      {/* Avatar */}
+      <div className="edit-profile__avatar">
+        <img src={previewAvatar || userData?.imagen || PROFILE_PICTURE} alt="Avatar" />
+        <label className="edit-profile__overlay edit-profile__overlay--small">
+          <i className="fa-solid fa-camera"></i>
+          <input type="file" accept="image/*" hidden onChange={handleAvatarUpload} />
+        </label>
+      </div>
 
-      <button type="submit">Guardar cambios</button>
+      {/* Campos */}
+      <div className="edit-profile__fields">
+        <div className="edit-profile__field">
+          <label>Nombre</label>
+          <input
+            value={editData.name}
+            onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+            maxLength={50}
+          />
+        </div>
+        <div className="edit-profile__field">
+          <label>Usuario</label>
+          <input
+            value={editData.username}
+            onChange={(e) => setEditData({ ...editData, username: e.target.value })}
+            maxLength={30}
+          />
+        </div>
+        <div className="edit-profile__field">
+          <label>Bio <span className="edit-profile__char-count">{editData.bio.length}/160</span></label>
+          <textarea
+            value={editData.bio}
+            onChange={(e) => setEditData({ ...editData, bio: e.target.value })}
+            maxLength={160}
+            rows={3}
+            placeholder="Contá algo sobre vos..."
+          />
+        </div>
+      </div>
+
+      <button type="submit" className="edit-profile__save">Guardar cambios</button>
     </form>
   </Modal>
 )}

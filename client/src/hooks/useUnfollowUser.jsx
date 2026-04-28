@@ -1,8 +1,8 @@
-import axios from "axios";
+import api from "@/api/axiosInstance";
 
 const useUnfollowUser = () => {
   const unfollowUser = async (userId) => {
-    await axios.post(`${import.meta.env.VITE_API_URL}/users/unfollow/${userId}`);
+    await api.post(`/users/unfollow/${userId}`, {});
   };
 
   return { unfollowUser };

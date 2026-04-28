@@ -23,7 +23,16 @@ const usuarioSchema = new mongoose.Schema({
     },
     imagen: {
         type: String,
-        required: false        
+        required: false
+    },
+    bannerImage: {
+        type: String,
+        required: false
+    },
+    bio: {
+        type: String,
+        required: false,
+        maxlength: 160
     },
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Users' }], // Usuarios que siguen a este usuario
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Users' }], // Usuarios que este usuario sigue

@@ -57,8 +57,6 @@ const Home = () => {
       navigate(`/game-details?id=${selectedGame}`);
     }
   }, [selectedGame]);
-console.log("suggestionsData:", suggestionsData);
-console.log("isArray:", Array.isArray(suggestionsData));
   return (
     <div className="home">
       <div className="home__banner">

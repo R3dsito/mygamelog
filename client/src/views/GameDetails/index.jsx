@@ -63,26 +63,17 @@ const [reviewData, setReviewData] = useState({
   getReviews();
 };
 
-console.log(reviewData);
-
 const handleToggleFavorite = async () => {
   try {
     const res = await toggleFavorite({ userId: user.id, gameId: gameData.id });
-    if (res?.isFavorite) {
-      setIsFavorite(true);
-      console.log("Juego agregado a favoritos");
-    } else {
-      setIsFavorite(false);
-      console.log("Juego eliminado de favoritos");
-    }
+    setIsFavorite(res?.isFavorite ?? false);
   } catch (err) {
-    console.error(err);
+    console.error("Error al togglear favorito:", err);
   }
 };
 
   const handleScoreChange = (score) => {
     setReviewData({ ...reviewData, score });
-    console.log(score);
   };
 
   const handleReviewChange = (e) => {
@@ -193,8 +184,9 @@ const handleToggleFavorite = async () => {
         imagen={review.userId.imagen}
         content={review.content}
         rating={review.rating}
+        postId={review._id}
+        likes={review.likes || []}
         onDelete={() => handleDelete(review._id)}
-
       />
     ))}
 </div>

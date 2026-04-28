@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 
 import {
+  Feed,
   GameDetails,
   Home,
   Login,
@@ -21,6 +22,7 @@ const App = () => {
 
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/feed" element={<Feed />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/game-details" element={<GameDetails />} />

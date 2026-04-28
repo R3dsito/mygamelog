@@ -1,8 +1,8 @@
-import axios from "axios";
+import api from "@/api/axiosInstance";
 
 const useFollowUser = () => {
   const followUser = async (userId) => {
-    await axios.post(`${import.meta.env.VITE_API_URL}/users/follow/${userId}`);
+    await api.post(`/users/follow/${userId}`, {});
   };
 
   return { followUser };

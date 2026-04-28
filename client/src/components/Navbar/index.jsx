@@ -1,27 +1,45 @@
-import { useContext, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { useContext, useState, useEffect, useRef } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import { AuthContext } from "@/contexts/AuthContext";
 import useSearchUsers from "@/hooks/useSearchUsers";
+import useDebounce from "@/hooks/useDebounce";
 import LOGO from "@/assets/my-game-log-logo.png";
 
-const PROFILE_PICTURE =
-  "https://pbs.twimg.com/media/Fvpd8chWcAEPllN.jpg";
+const PROFILE_PICTURE = "https://pbs.twimg.com/media/Fvpd8chWcAEPllN.jpg";
 
 const Navbar = () => {
   const { user, logoutUser } = useContext(AuthContext);
-  const { results = [], searchUsers } = useSearchUsers();
+  const { data = [], searchUsers } = useSearchUsers();
   const [query, setQuery] = useState("");
+  const [showResults, setShowResults] = useState(false);
+  const debouncedQuery = useDebounce(query, 300);
+  const searchRef = useRef(null);
+  const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    const value = e.target.value;
-    setQuery(value);
-
-    if (value.trim().length > 0) {
-      searchUsers(value);
+  useEffect(() => {
+    if (debouncedQuery.trim().length > 0) {
+      searchUsers(debouncedQuery);
+      setShowResults(true);
+    } else {
+      setShowResults(false);
     }
-  };
+  }, [debouncedQuery]);
 
-  const showResults = query.length > 0 && results.length > 0;
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setShowResults(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSelectUser = (username) => {
+    setQuery("");
+    setShowResults(false);
+    navigate(`/profile/username/${username}`);
+  };
 
   return (
     <nav className="navbar">
@@ -32,40 +50,41 @@ const Navbar = () => {
         </div>
       </NavLink>
 
-      {/* <div className="home__searcher">
+      <div className="navbar__search" ref={searchRef}>
         <input
           type="text"
           placeholder="Buscar usuarios..."
           value={query}
-          onChange={handleChange}
+          onChange={(e) => setQuery(e.target.value)}
+          onFocus={() => query.trim().length > 0 && setShowResults(true)}
         />
 
-        {showResults && (
-          <div className="home__results">
-            {results.map((u) => (
-              <NavLink
+        {showResults && data.length > 0 && (
+          <div className="navbar__search__results">
+            {data.map((u) => (
+              <div
                 key={u._id}
-                to={`/profile/username/${u.username}`}
-                className="home__results__result"
-                onClick={() => setQuery("")}
+                className="navbar__search__result"
+                onClick={() => handleSelectUser(u.username)}
               >
-                <div>
-                  <img
-                    src={u.imagen || PROFILE_PICTURE}
-                    alt={u.username}
-                  />
-                </div>
+                <img src={u.imagen || PROFILE_PICTURE} alt={u.username} />
                 <p>{u.username}</p>
-              </NavLink>
+              </div>
             ))}
           </div>
         )}
-      </div> */}
+      </div>
 
       <ul>
         <li>
           <NavLink to="/">
             <i className="fa-solid fa-gamepad"></i>Home
+          </NavLink>
+        </li>
+
+        <li>
+          <NavLink to="/feed">
+            <i className="fa-solid fa-newspaper"></i>Feed
           </NavLink>
         </li>
 

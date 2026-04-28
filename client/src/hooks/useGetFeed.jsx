@@ -1,21 +1,15 @@
 import { useState } from "react";
 import api from "@/api/axiosInstance";
 
-const useSearchUsers = () => {
+const useGetFeed = () => {
   const [state, setState] = useState("idle");
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
 
-  const searchUsers = async (query) => {
-    if (!query) {
-      setData([]);
-      return;
-    }
-
+  const getFeed = async () => {
     setState("loading");
-
     try {
-      const res = await api.get(`/users/search?q=${query}`);
+      const res = await api.get("/posts/latest");
       setData(res.data);
       setState("success");
     } catch (err) {
@@ -24,7 +18,7 @@ const useSearchUsers = () => {
     }
   };
 
-  return { state, data, error, searchUsers };
+  return { state, data, error, getFeed };
 };
 
-export default useSearchUsers;
+export default useGetFeed;
