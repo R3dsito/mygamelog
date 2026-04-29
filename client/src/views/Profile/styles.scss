@@ -141,6 +141,83 @@
     text-align: center;
   }
 
+  &__playlists {
+    width: 75%;
+    margin-top: 32px;
+    border-top: 1px solid wheat;
+    padding-top: 8px;
+
+    &__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 8px 0 16px;
+
+      h3 { margin: 0; }
+
+      button {
+        background: #021603;
+        color: wheat;
+        border: none;
+        border-radius: 20px;
+        padding: 6px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        &:hover { opacity: 0.85; }
+      }
+    }
+
+    &__new {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      input {
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 13px;
+        color: #021603;
+        outline: none;
+        &:focus { border-color: #1da1f2; }
+      }
+
+      button {
+        padding: 6px 14px;
+        border-radius: 20px;
+        border: none;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+
+        &:first-of-type { background: #eee; color: #555; }
+        &:last-of-type {
+          background: #021603;
+          color: wheat;
+          &:disabled { opacity: 0.5; cursor: not-allowed; }
+        }
+      }
+    }
+
+    &__list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 14px;
+    }
+
+    &__empty {
+      font-size: 13px;
+      opacity: 0.5;
+      color: #021603;
+      text-align: center;
+      padding: 12px 0;
+    }
+  }
+
   &__reviews {
     width: 75%;
     text-align: center;

@@ -2,6 +2,8 @@ import { useEffect, useContext, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 
 import { Favorite, Loader, Review, Modal } from "@/components";
+import PlaylistCard from "@/components/PlaylistCard";
+import PlaylistDetailModal from "@/components/PlaylistDetailModal";
 import api from "@/api/axiosInstance";
 import useGetSuggestions from "@/hooks/useGetSuggestions";
 import useGetUserReviews from "@/hooks/useGetUserReviews";
@@ -11,6 +13,8 @@ import { AuthContext } from "@/contexts/AuthContext";
 import useGetUserByUsername from "@/hooks/useGetUserByUsername";
 import useToggleFavorite from "@/hooks/useToggleFavorite";
 import useGetFavorites from "@/hooks/useGetFavorites";
+import useGetUserPlaylists from "@/hooks/useGetUserPlaylists";
+import useManagePlaylists from "@/hooks/useManagePlaylists";
 
 
 
@@ -34,6 +38,12 @@ const { deleteReview } = useDeleteReview();
 const [editData, setEditData] = useState({ name: "", username: "", email: "", bio: "" });
 const [previewAvatar, setPreviewAvatar] = useState(null);
 const [previewBanner, setPreviewBanner] = useState(null);
+
+const { data: playlists, fetchPlaylists, setData: setPlaylists } = useGetUserPlaylists();
+const { createPlaylist } = useManagePlaylists();
+const [newPlaylistName, setNewPlaylistName] = useState("");
+const [showNewPlaylist, setShowNewPlaylist] = useState(false);
+const [selectedPlaylist, setSelectedPlaylist] = useState(null);
 
 
   const {
@@ -75,6 +85,7 @@ const [previewBanner, setPreviewBanner] = useState(null);
   const id = userIdFromUrl || userDataByUsername?._id;
   if (id) {
     getFavorites(id);
+    fetchPlaylists(id);
   }
 }, [userIdFromUrl, userDataByUsername]);
 
@@ -159,6 +170,14 @@ const handleBannerUpload = async (e) => {
     console.error("Error al subir banner:", err);
     setPreviewBanner(null);
   }
+};
+
+const handleCreatePlaylist = async () => {
+  if (!newPlaylistName.trim()) return;
+  const res = await createPlaylist(newPlaylistName.trim());
+  setPlaylists((prev) => [...prev, res.data]);
+  setNewPlaylistName("");
+  setShowNewPlaylist(false);
 };
 
 const handleUpdateProfile = async () => {
@@ -307,6 +326,49 @@ const handleUpdateProfile = async () => {
     <p className="profile_nofavorites">No hay juegos favoritos aún.</p>
   )}
 
+      <div className="profile__playlists">
+        <div className="profile__playlists__header">
+          <h3>Playlists</h3>
+          {isMyProfile && (
+            showNewPlaylist ? (
+              <div className="profile__playlists__new">
+                <input
+                  type="text"
+                  placeholder="Nombre de la playlist"
+                  maxLength={50}
+                  value={newPlaylistName}
+                  onChange={(e) => setNewPlaylistName(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleCreatePlaylist()}
+                  autoFocus
+                />
+                <button onClick={() => setShowNewPlaylist(false)}>Cancelar</button>
+                <button onClick={handleCreatePlaylist} disabled={!newPlaylistName.trim()}>Crear</button>
+              </div>
+            ) : (
+              <button onClick={() => setShowNewPlaylist(true)}>
+                <i className="fa-solid fa-plus" /> Nueva
+              </button>
+            )
+          )}
+        </div>
+        {playlists.length === 0 ? (
+          <p className="profile__playlists__empty">No hay playlists aún.</p>
+        ) : (
+          <div className="profile__playlists__list">
+            {playlists.map((pl) => (
+              <PlaylistCard
+                key={pl._id}
+                playlist={pl}
+                isOwner={isMyProfile}
+                onClick={() => setSelectedPlaylist(pl)}
+                onDeleted={(id) => setPlaylists((prev) => prev.filter((p) => p._id !== id))}
+                onUpdated={(updated) => setPlaylists((prev) => prev.map((p) => p._id === updated._id ? updated : p))}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
       <div className="profile__reviews">
         <h3>Reviews</h3>
         {userReviewsState === "loading" && <Loader />}
@@ -335,6 +397,13 @@ const handleUpdateProfile = async () => {
             ))}
         </div>
       </div>
+{selectedPlaylist && (
+  <PlaylistDetailModal
+    playlist={selectedPlaylist}
+    onClose={() => setSelectedPlaylist(null)}
+  />
+)}
+
 {showFollowersModal && (
   <Modal
     isOpen={showFollowersModal}

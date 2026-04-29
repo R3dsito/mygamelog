@@ -1,6 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import { userRoutes, projectroutes, taskroutes, gameRoutes, postRoutes } from './routes/index.js';
+import { userRoutes, projectroutes, taskroutes, gameRoutes, postRoutes, playlistRoutes } from './routes/index.js';
 import 'dotenv/config';
 import cors from "cors"
 import { connectDB } from "./db/mongoose.js";
@@ -36,6 +36,7 @@ app.get('/',(req, res) => {
 app.use('/posts' , postRoutes)
 app.use('/games', gameRoutes);
 app.use('/users', userRoutes);
+app.use('/playlists', playlistRoutes);
 app.use('/projects', projectroutes);
 app.use('/tasks', taskroutes);
 // export default app;

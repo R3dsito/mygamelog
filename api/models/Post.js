@@ -34,4 +34,7 @@ const postSchema = new mongoose.Schema({
   },
 });
 
+// Un usuario solo puede dejar una review por juego
+postSchema.index({ userId: 1, gameId: 1 }, { unique: true });
+
 export default mongoose.model("Post", postSchema);

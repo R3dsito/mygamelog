@@ -7,6 +7,7 @@ import {
   showPostsById,
   getLatestPosts,
   toggleLike,
+  getScoreByGameId,
 } from "../controllers/postController.js";
 import { verificarToken } from "../middlewares/auth.js";
 
@@ -18,6 +19,7 @@ postRoutes.post("/", verificarToken, createPost);
 // Rutas estáticas primero (antes de /:gameId para evitar conflictos)
 postRoutes.get("/latest", getLatestPosts);
 postRoutes.get("/user/:userId", showPostsById);
+postRoutes.get("/score/:gameId", getScoreByGameId);
 postRoutes.post("/:id/like", verificarToken, toggleLike);
 
 // Obtener todos los posts de un juego

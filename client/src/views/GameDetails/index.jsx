@@ -3,12 +3,14 @@ import { useSearchParams } from "react-router-dom";
 import dayjs from "dayjs";
 
 import { Loader, Modal, Review } from "@/components";
+import AddToPlaylistModal from "@/components/AddToPlaylistModal";
 
 import useGetGame from "@/hooks/useGetGame";
 import useGetReviews from "@/hooks/useGetReviews";
 import usePostReview from "@/hooks/usePostReview";
 import useDeleteReview from "@/hooks/useDeleteReview";
 import useToggleFavorite from "@/hooks/useToggleFavorite";
+import useGetGameScore from "@/hooks/useGetGameScore";
 
 import { AuthContext } from "@/contexts/AuthContext";
 
@@ -20,6 +22,8 @@ const GameDetails = () => {
   const { toggleFavorite, loading } = useToggleFavorite();
   const [isFavorite, setIsFavorite] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [showPlaylistModal, setShowPlaylistModal] = useState(false);
+  const { data: gameScore, fetchScore } = useGetGameScore();
 const [reviewData, setReviewData] = useState({
   score: 0,
   review: "",
@@ -84,12 +88,14 @@ const handleToggleFavorite = async () => {
     if (id) {
       getGame();
       getReviews();
+      fetchScore(id);
     }
   }, []);
 
   useEffect(() => {
     if (postReviewState === "success") {
       getReviews();
+      fetchScore(id);
     }
   }, [postReviewState]);
 
@@ -109,12 +115,15 @@ const handleToggleFavorite = async () => {
             >
               <h3>
                 {gameData.name}
-                <span>
-                  {" "}
-                  ({dayjs(gameData.released).format("YYYY")}) -{" "}
-                  <i className="fa-solid fa-star"></i> {gameData.rating}
-                </span>
+                <span> ({dayjs(gameData.released).format("YYYY")})</span>
               </h3>
+              <div className="game-details__score">
+                <i className="fa-solid fa-star" />
+                {gameScore.totalReviews > 0
+                  ? <><strong>{gameScore.averageScore.toFixed(1)}</strong><span>/10 · {gameScore.totalReviews} {gameScore.totalReviews === 1 ? "reseña" : "reseñas"}</span></>
+                  : <span>Sin reseñas aún</span>
+                }
+              </div>
               <div>
                 {gameData.publishers.map((publisher, index) => (
                   <Fragment key={publisher.id}>
@@ -129,6 +138,11 @@ const handleToggleFavorite = async () => {
           <div className="game-details__content">
             <div className="game-details__content__actions">
               <button onClick={() => setIsOpen(true)}>Nueva reseña</button>
+              {user && (
+                <button onClick={() => setShowPlaylistModal(true)}>
+                  <i className="fa-solid fa-bookmark" /> Playlist
+                </button>
+              )}
             </div>
 
             <h4>Descripción:</h4>
@@ -197,6 +211,17 @@ const handleToggleFavorite = async () => {
           <Loader />
           <p>Cargando detalles del juego</p>
         </div>
+      )}
+
+      {showPlaylistModal && gameData && (
+        <AddToPlaylistModal
+          game={{
+            gameId: gameData.id,
+            gameName: gameData.name,
+            imageUrl: gameData.background_image,
+          }}
+          onClose={() => setShowPlaylistModal(false)}
+        />
       )}
 
       <Modal
