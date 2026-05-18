@@ -42,7 +42,7 @@ app.use('/users', userRoutes);
 app.use('/playlists', playlistRoutes);
 app.use('/projects', projectroutes);
 app.use('/tasks', taskroutes);
-// export default app;
+ export default app;
 
    const port = process.env.PORT || 3002;
    app.listen(port, () => {
