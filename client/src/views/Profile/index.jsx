@@ -4,6 +4,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { Favorite, Loader, Review, Modal } from "@/components";
 import PlaylistCard from "@/components/PlaylistCard";
 import PlaylistDetailModal from "@/components/PlaylistDetailModal";
+import ProfileEditModal from "@/components/ProfileEditModal";
 import api from "@/api/axiosInstance";
 import useGetSuggestions from "@/hooks/useGetSuggestions";
 import useGetUserReviews from "@/hooks/useGetUserReviews";
@@ -35,9 +36,7 @@ const [showEditModal, setShowEditModal] = useState(false);
 
 const { deleteReview } = useDeleteReview();
 
-const [editData, setEditData] = useState({ name: "", username: "", email: "", bio: "" });
-const [previewAvatar, setPreviewAvatar] = useState(null);
-const [previewBanner, setPreviewBanner] = useState(null);
+
 
 const { data: playlists, fetchPlaylists, setData: setPlaylists } = useGetUserPlaylists();
 const { createPlaylist } = useManagePlaylists();
@@ -144,33 +143,6 @@ const handleToggleFavorite = async (postId) => {
   }
 };
 
-const handleAvatarUpload = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  setPreviewAvatar(URL.createObjectURL(file));
-  const formData = new FormData();
-  formData.append("profileImage", file);
-  try {
-    await api.post(`/users/upload-profile-image/${loggedInUser.id}`, formData);
-  } catch (err) {
-    console.error("Error al subir avatar:", err);
-    setPreviewAvatar(null);
-  }
-};
-
-const handleBannerUpload = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  setPreviewBanner(URL.createObjectURL(file));
-  const formData = new FormData();
-  formData.append("bannerImage", file);
-  try {
-    await api.post(`/users/upload-banner-image/${loggedInUser.id}`, formData);
-  } catch (err) {
-    console.error("Error al subir banner:", err);
-    setPreviewBanner(null);
-  }
-};
 
 const handleCreatePlaylist = async () => {
   if (!newPlaylistName.trim()) return;
@@ -180,34 +152,13 @@ const handleCreatePlaylist = async () => {
   setShowNewPlaylist(false);
 };
 
-const handleUpdateProfile = async () => {
-  try {
-    await api.put(`/users/update/${loggedInUser.id}`, editData);
-    setShowEditModal(false);
-    setPreviewAvatar(null);
-    setPreviewBanner(null);
-    setUser((prev) => ({ ...prev, name: editData.name, username: editData.username }));
-    // Navegar a la nueva URL para que el componente se remonte con el username correcto
-    navigate(`/profile/username/${editData.username}`, { replace: true });
-  } catch (error) {
-    console.error("Error al actualizar perfil:", error);
-  }
+const handleProfileSaved = (newUsername) => {
+  setShowEditModal(false);
+  navigate(`/profile/username/${newUsername}`, { replace: true });
 };
 
 
 
-
-
-  useEffect(() => {
-    if (showEditModal && userData) {
-      setEditData({
-        name: userData.name || "",
-        username: userData.username || "",
-        email: userData.email || "",
-        bio: userData.bio || "",
-      });
-    }
-  }, [showEditModal]);
 
   const isMyProfile = loggedInUser?.id === (userIdFromUrl || userData?._id);
   
@@ -454,71 +405,12 @@ const handleUpdateProfile = async () => {
   </Modal>
 )}
 
-{showEditModal && (
-  <Modal
-    isOpen={showEditModal}
-    setIsOpen={setShowEditModal}
-    title="Editar perfil"
-  >
-    <form
-      onSubmit={(e) => { e.preventDefault(); handleUpdateProfile(); }}
-      className="edit-profile"
-    >
-      {/* Banner */}
-      <div className="edit-profile__banner">
-        <img
-          src={previewBanner || userData?.bannerImage || "https://image.tensorartassets.com/cdn-cgi/image/anim=true,plain=false,w=2048,f=jpeg,q=85/posts/images/646889879699062307/8f152d51-dd42-404f-898d-8a1c38f12a6b.jpg"}
-          alt="Banner"
-        />
-        <label className="edit-profile__overlay">
-          <i className="fa-solid fa-camera"></i>
-          <input type="file" accept="image/*" hidden onChange={handleBannerUpload} />
-        </label>
-      </div>
-
-      {/* Avatar */}
-      <div className="edit-profile__avatar">
-        <img src={previewAvatar || userData?.imagen || PROFILE_PICTURE} alt="Avatar" />
-        <label className="edit-profile__overlay edit-profile__overlay--small">
-          <i className="fa-solid fa-camera"></i>
-          <input type="file" accept="image/*" hidden onChange={handleAvatarUpload} />
-        </label>
-      </div>
-
-      {/* Campos */}
-      <div className="edit-profile__fields">
-        <div className="edit-profile__field">
-          <label>Nombre</label>
-          <input
-            value={editData.name}
-            onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-            maxLength={50}
-          />
-        </div>
-        <div className="edit-profile__field">
-          <label>Usuario</label>
-          <input
-            value={editData.username}
-            onChange={(e) => setEditData({ ...editData, username: e.target.value })}
-            maxLength={30}
-          />
-        </div>
-        <div className="edit-profile__field">
-          <label>Bio <span className="edit-profile__char-count">{editData.bio.length}/160</span></label>
-          <textarea
-            value={editData.bio}
-            onChange={(e) => setEditData({ ...editData, bio: e.target.value })}
-            maxLength={160}
-            rows={3}
-            placeholder="Contá algo sobre vos..."
-          />
-        </div>
-      </div>
-
-      <button type="submit" className="edit-profile__save">Guardar cambios</button>
-    </form>
-  </Modal>
-)}
+<ProfileEditModal
+  isOpen={showEditModal}
+  setIsOpen={setShowEditModal}
+  userData={userData}
+  onSaved={handleProfileSaved}
+/>
 
 
     </div>

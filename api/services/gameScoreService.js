@@ -3,17 +3,13 @@ import GameScore from "../models/GameScore.js";
 // Todas las operaciones son O(1): usamos scoreSum en lugar de recalcular desde cero.
 
 export const onReviewCreated = async (gameId, rating) => {
-  await GameScore.findOneAndUpdate(
+  const doc = await GameScore.findOneAndUpdate(
     { gameId },
-    {
-      $inc: { totalReviews: 1, scoreSum: rating },
-      $set: { averageScore: 0 }, // se sobreescribe abajo
-    },
+    { $inc: { totalReviews: 1, scoreSum: rating } },
     { upsert: true, new: true }
-  ).then((doc) => {
-    doc.averageScore = doc.scoreSum / doc.totalReviews;
-    return doc.save();
-  });
+  );
+  doc.averageScore = doc.scoreSum / doc.totalReviews;
+  await doc.save();
 };
 
 export const onReviewUpdated = async (gameId, oldRating, newRating) => {

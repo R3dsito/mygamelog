@@ -4,17 +4,25 @@ import 'dotenv/config';
 import jwt from 'jsonwebtoken';
 import Posts from "../models/Post.js";
 import cloudinary from "../config/cloudinary.js";
-// Obtener todos los usuarios
+
+const isValidObjectId = (id) => /^[a-f\d]{24}$/i.test(id);
+
+// escapa caracteres especiales de regex para evitar ReDoS
+const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 const getUsers = async (req, res) => {
     try {
-        let usuarios = await Users.find();
+        let usuarios = await Users.find().select("-password");
         res.json(usuarios);
     } catch (error) {
-        res.status(400).json({ error });
+        res.status(500).json({ error: "Error al obtener usuarios" });
     }
 };
 
 const getUser = async (req, res) => {
+  if (!isValidObjectId(req.params.userId)) {
+    return res.status(400).json({ message: "ID inválido" });
+  }
   try {
     let usuario = await Users.findById(req.params.userId)
       .populate("followers", "_id username imagen")
@@ -144,7 +152,7 @@ const searchUsers = async (req, res) => {
     }
 
     const users = await Users.find({
-      username: { $regex: q, $options: "i" }
+      username: { $regex: escapeRegex(q), $options: "i" }
     })
       .select("_id username imagen")
       .limit(10);
@@ -163,15 +171,30 @@ const updateUser = async (req, res) => {
 
   const { name, username, email, bio } = req.body;
 
-  const user = await Users.findByIdAndUpdate(
-    req.params.userId,
-    { name, username, email, bio },
-    { new: true }
-  ).select("-password");
+  if (!name?.trim() || !username?.trim()) {
+    return res.status(400).json({ message: "Nombre y usuario son obligatorios" });
+  }
+  if (bio && bio.length > 160) {
+    return res.status(400).json({ message: "La bio no puede superar los 160 caracteres" });
+  }
 
-  res.json(user);
+  try {
+    const user = await Users.findByIdAndUpdate(
+      req.params.userId,
+      { name: name.trim(), username: username.trim().toLowerCase(), email, bio },
+      { new: true, runValidators: true }
+    ).select("-password");
+    res.json(user);
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({ message: "El nombre de usuario ya está en uso" });
+    }
+    res.status(500).json({ message: "Error al actualizar el perfil" });
+  }
 };
 
+
+const ALLOWED_MIME = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 const updateProfileImage = async (req, res) => {
   try {
@@ -183,6 +206,9 @@ const updateProfileImage = async (req, res) => {
 
     if (!req.file) {
       return res.status(400).json({ error: "No image provided" });
+    }
+    if (!ALLOWED_MIME.includes(req.file.mimetype)) {
+      return res.status(400).json({ error: "Formato de imagen no permitido" });
     }
 
     const result = await cloudinary.uploader.upload(
@@ -219,6 +245,9 @@ const uploadBannerImage = async (req, res) => {
 
     if (!req.file) {
       return res.status(400).json({ error: "No image provided" });
+    }
+    if (!ALLOWED_MIME.includes(req.file.mimetype)) {
+      return res.status(400).json({ error: "Formato de imagen no permitido" });
     }
 
     const result = await cloudinary.uploader.upload(
@@ -341,6 +370,39 @@ const getFavorites = async (req, res) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  if (req.usuario._id.toString() !== req.params.userId) {
+    return res.status(403).json({ message: "No autorizado" });
+  }
+
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ message: "Contraseña actual y nueva son requeridas" });
+  }
+  if (newPassword.length < 6) {
+    return res.status(400).json({ message: "La nueva contraseña debe tener al menos 6 caracteres" });
+  }
+  if (currentPassword === newPassword) {
+    return res.status(400).json({ message: "La nueva contraseña debe ser diferente a la actual" });
+  }
+
+  try {
+    const user = await Users.findById(req.params.userId);
+    if (!user) return res.status(404).json({ message: "Usuario no encontrado" });
+
+    const valid = bcrypt.compareSync(currentPassword, user.password);
+    if (!valid) return res.status(401).json({ message: "La contraseña actual es incorrecta" });
+
+    user.password = bcrypt.hashSync(newPassword, 10);
+    await user.save();
+
+    res.json({ message: "Contraseña actualizada correctamente" });
+  } catch (error) {
+    res.status(500).json({ message: "Error al cambiar la contraseña" });
+  }
+};
+
 export {
     getUsers,
     getUser,
@@ -351,6 +413,7 @@ export {
     updateUser,
     updateProfileImage,
     uploadBannerImage,
+    changePassword,
     followUser,
     unfollowUser,
     toggleFavorite,

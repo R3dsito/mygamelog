@@ -15,7 +15,10 @@ const app = express();
 
 
 app.use(cors({
-  allowedHeaders: ['Content-Type', 'Authorization', 'token']
+  origin: ['https://mygamelog.vercel.app', 'http://localhost:5173'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'token'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  credentials: true
 }));
 
 app.use(async (req, res, next) => {

@@ -44,7 +44,10 @@ export const updatePlaylist = async (req, res) => {
       return res.status(403).json({ message: "No autorizado" });
 
     const { name, description } = req.body;
-    if (name !== undefined) playlist.name = name;
+    if (name !== undefined) {
+      if (!name.trim()) return res.status(400).json({ message: "El nombre no puede estar vacío" });
+      playlist.name = name.trim();
+    }
     if (description !== undefined) playlist.description = description;
     await playlist.save();
     res.json(playlist);

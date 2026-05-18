@@ -29,6 +29,7 @@ const [reviewData, setReviewData] = useState({
   review: "",
   addToFavorites: false,
 });
+const [reviewError, setReviewError] = useState("");
 
   const {
     state: gameState,
@@ -274,23 +275,35 @@ const handleToggleFavorite = async () => {
           </button>
 
 
+{reviewError && <p className="new-review-modal__error">{reviewError}</p>}
+
 <button
   onClick={async () => {
+    setReviewError("");
+    if (!reviewData.score || reviewData.score < 1) {
+      return setReviewError("Seleccioná una puntuación antes de publicar.");
+    }
+    if (!reviewData.review.trim()) {
+      return setReviewError("Escribí algo en la reseña antes de publicar.");
+    }
     try {
-      const newPost = await postReview(); // ← ahora tenés el post creado
+      const newPost = await postReview();
       getReviews();
 
       if (reviewData.addToFavorites && newPost?._id) {
-        const res = await toggleFavorite({
-          userId: user.id,
-          postId: newPost._id, // ← asegurado y directo
-        });
+        const res = await toggleFavorite({ userId: user.id, postId: newPost._id });
         setIsFavorite(res.isFavorite);
       }
 
       setIsOpen(false);
+      setReviewData({ score: 0, review: "", addToFavorites: false });
     } catch (err) {
-      console.error("Error al postear o marcar favorito:", err);
+      const status = err?.response?.status;
+      if (status === 409) {
+        setReviewError("Ya publicaste una reseña para este juego.");
+      } else {
+        setReviewError("Error al publicar la reseña. Intentá de nuevo.");
+      }
     }
   }}
 >

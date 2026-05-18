@@ -1,0 +1,226 @@
+.pem {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 420px;
+
+  &__tabs {
+    display: flex;
+    border-bottom: 2px solid #eee;
+    gap: 4px;
+  }
+
+  &__tab {
+    background: none;
+    border: none;
+    padding: 8px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #888;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: color 0.15s, border-color 0.15s;
+
+    &--active {
+      color: #021603;
+      border-bottom-color: #021603;
+    }
+
+    &:hover:not(&--active) { color: #444; }
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  // ── Imágenes ──────────────────────────────────
+  &__banner {
+    position: relative;
+    height: 90px;
+    border-radius: 10px;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__avatar {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-top: -40px;
+    margin-left: 12px;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+
+    i { color: #fff; font-size: 20px; }
+
+    &:hover { opacity: 1; }
+
+    &--small i { font-size: 14px; }
+  }
+
+  // ── Campos ────────────────────────────────────
+  &__fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    &--password {
+      margin-top: 8px;
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #555;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    input, textarea {
+      padding: 9px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #021603;
+      outline: none;
+      transition: border-color 0.15s;
+      font-family: inherit;
+
+      &:focus { border-color: #021603; }
+    }
+
+    textarea { resize: vertical; }
+  }
+
+  &__input-prefix {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.15s;
+
+    &:focus-within { border-color: #021603; }
+
+    span {
+      padding: 9px 10px;
+      font-size: 14px;
+      color: #888;
+      background: #f5f5f5;
+      border-right: 1px solid #ddd;
+    }
+
+    input {
+      border: none;
+      border-radius: 0;
+      flex: 1;
+      &:focus { border-color: transparent; }
+    }
+  }
+
+  &__char-count {
+    font-size: 11px;
+    font-weight: 400;
+    color: #aaa;
+  }
+
+  &__field-hint {
+    font-size: 11px;
+    color: #c0392b;
+    margin-top: 2px;
+  }
+
+  // ── Password strength ─────────────────────────
+  &__pw-strength {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+
+    span {
+      font-size: 11px;
+      color: #666;
+    }
+  }
+
+  &__pw-bar {
+    height: 4px;
+    width: 80px;
+    border-radius: 4px;
+    background: #eee;
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 4px;
+    }
+
+    &--weak::after    { width: 33%; background: #e74c3c; }
+    &--medium::after  { width: 66%; background: #f39c12; }
+    &--strong::after  { width: 100%; background: #27ae60; }
+  }
+
+  // ── Mensajes ──────────────────────────────────
+  &__msg {
+    font-size: 13px;
+    padding: 8px 12px;
+    border-radius: 6px;
+
+    &--error   { background: #fdecea; color: #c0392b; }
+    &--success { background: #eafaf1; color: #1e8449; }
+  }
+
+  // ── Submit ────────────────────────────────────
+  &__submit {
+    background: #021603;
+    color: wheat;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    align-self: flex-end;
+    transition: opacity 0.15s;
+
+    &:hover { opacity: 0.85; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+}

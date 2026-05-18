@@ -1,10 +1,12 @@
 import { useState } from "react";
 import useManagePlaylists from "@/hooks/useManagePlaylists";
+import Modal from "@/components/Modal";
 import "./styles.scss";
 
 const PlaylistCard = ({ playlist, isOwner, onDeleted, onUpdated, onClick }) => {
   const { updatePlaylist, deletePlaylist } = useManagePlaylists();
   const [editing, setEditing] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [name, setName] = useState(playlist.name);
   const [description, setDescription] = useState(playlist.description || "");
 
@@ -17,8 +19,8 @@ const PlaylistCard = ({ playlist, isOwner, onDeleted, onUpdated, onClick }) => {
   };
 
   const handleDelete = async () => {
-    if (!confirm(`¿Eliminar la playlist "${playlist.name}"?`)) return;
     await deletePlaylist(playlist._id);
+    setConfirmOpen(false);
     onDeleted(playlist._id);
   };
 
@@ -70,11 +72,21 @@ const PlaylistCard = ({ playlist, isOwner, onDeleted, onUpdated, onClick }) => {
           <button onClick={() => setEditing(true)} title="Editar">
             <i className="fa-solid fa-pen" />
           </button>
-          <button onClick={handleDelete} title="Eliminar">
+          <button onClick={() => setConfirmOpen(true)} title="Eliminar">
             <i className="fa-solid fa-trash" />
           </button>
         </div>
       )}
+
+      <Modal isOpen={confirmOpen} setIsOpen={setConfirmOpen} title="Eliminar playlist">
+        <div className="playlist-card__confirm">
+          <p>¿Querés eliminar <strong>{playlist.name}</strong>? Esta acción no se puede deshacer.</p>
+          <div className="playlist-card__confirm-actions">
+            <button onClick={() => setConfirmOpen(false)}>Cancelar</button>
+            <button className="playlist-card__confirm-delete" onClick={handleDelete}>Eliminar</button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

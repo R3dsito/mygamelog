@@ -152,6 +152,15 @@
     display: flex;
     flex-direction: column;
 
+    &__error {
+        color: #c0392b;
+        font-size: 13px;
+        background: #fdecea;
+        border-radius: 6px;
+        padding: 8px 12px;
+        margin-bottom: 8px;
+    }
+
     &__rating {
         width: 100%;
         display: flex;
