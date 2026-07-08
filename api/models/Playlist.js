@@ -20,4 +20,7 @@ const playlistSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Support user-playlist lookups by userId
+playlistSchema.index({ userId: 1 });
+
 export default mongoose.model("Playlist", playlistSchema);
