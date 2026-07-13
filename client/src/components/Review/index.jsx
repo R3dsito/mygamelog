@@ -4,6 +4,23 @@ import { useContext } from "react";
 import { AuthContext } from "@/contexts/AuthContext";
 import useToggleLike from "@/hooks/useToggleLike";
 
+const RatingStars = ({ rating }) => {
+  const full = Math.floor(rating / 2);
+  const hasHalf = rating % 2 === 1;
+
+  return (
+    <span className="review__stars" aria-label={`${rating}/10`}>
+      {Array.from({ length: 5 }).map((_, i) => {
+        const pos = i + 1;
+        let icon = "fa-regular fa-star";
+        if (pos <= full) icon = "fa-solid fa-star";
+        else if (pos === full + 1 && hasHalf) icon = "fa-solid fa-star-half-stroke";
+        return <i key={i} className={icon}></i>;
+      })}
+    </span>
+  );
+};
+
 const Review = ({ username, imagen, content, rating, onDelete, gameName, imageUrl, gameId, postId, likes = [] }) => {
   const { user: loggedInUser } = useContext(AuthContext);
   const { toggleLike, loading: likeLoading } = useToggleLike();
@@ -26,34 +43,56 @@ const Review = ({ username, imagen, content, rating, onDelete, gameName, imageUr
 
   return (
     <div className="review">
-      <div className="review__content">
-        {gameName && <h4 onClick={handleOnClick}>{gameName}</h4>}
-        {username && <h4 onClick={handleOnClickUser}>{username}</h4>}
-        <p>{content}</p>
-
-        <div className="review__actions">
-          <span>
-            <i className="fa-solid fa-star"></i>{rating}/10
-          </span>
-
-          <div className="review__actions__right">
-            {postId && (
-              <button
-                className={`review__like ${isLiked ? "review__like--active" : ""}`}
-                onClick={handleLike}
-                disabled={!loggedInUser || likeLoading}
-              >
-                <i className={`fa-${isLiked ? "solid" : "regular"} fa-heart`}></i>
-                {likesCount > 0 && <span>{likesCount}</span>}
-              </button>
-            )}
-
-            {loggedInUser?.username === username && (
-              <button onClick={onDelete}>
-                <i className="fa-solid fa-trash"></i>Eliminar
-              </button>
-            )}
+      {imageUrl && (
+        <div className="review__image-container">
+          <div className="review__image" onClick={handleOnClick}>
+            <img src={imageUrl} alt={gameName} />
           </div>
+        </div>
+      )}
+
+      <div className="review__content">
+        <div className="review__header">
+          <div className="review__avatar" onClick={handleOnClickUser}>
+            {imagen ? <img src={imagen} alt={username} /> : <i className="fa-solid fa-user"></i>}
+          </div>
+
+          <div className="review__meta">
+            {gameName && (
+              <h4 className="review__game" onClick={handleOnClick}>
+                {gameName}
+              </h4>
+            )}
+            <div className="review__byline">
+              <span>Reseña de </span>
+              <span className="review__user" onClick={handleOnClickUser}>
+                {username}
+              </span>
+              {rating != null && <RatingStars rating={rating} />}
+            </div>
+          </div>
+        </div>
+
+        <p className="review__text">{content}</p>
+
+        <div className="review__footer">
+          {postId && (
+            <button
+              className={`review__like ${isLiked ? "review__like--active" : ""}`}
+              onClick={handleLike}
+              disabled={!loggedInUser || likeLoading}
+            >
+              <i className={`fa-${isLiked ? "solid" : "regular"} fa-heart`}></i>
+              <span>Me gusta</span>
+              {likesCount > 0 && <span className="review__like-count">{likesCount}</span>}
+            </button>
+          )}
+
+          {loggedInUser?.username === username && (
+            <button className="review__delete" onClick={onDelete}>
+              <i className="fa-solid fa-trash"></i>Eliminar
+            </button>
+          )}
         </div>
       </div>
     </div>

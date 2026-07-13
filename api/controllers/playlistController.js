@@ -17,6 +17,18 @@ export const createPlaylist = async (req, res) => {
   }
 };
 
+export const getTrendingPlaylists = async (req, res) => {
+  try {
+    const playlists = await Playlist.find({ "games.0": { $exists: true } })
+      .sort({ updatedAt: -1 })
+      .limit(6)
+      .populate("userId", "username imagen");
+    res.json(playlists);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export const getUserPlaylists = async (req, res) => {
   try {
     const playlists = await Playlist.find({ userId: req.params.userId });

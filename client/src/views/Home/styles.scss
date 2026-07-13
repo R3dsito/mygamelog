@@ -115,6 +115,111 @@
         }
     }
 
+    &__community {
+        width: 75%;
+        margin-top: 24px;
+        border-top: 1px solid wheat;
+        display: flex;
+        align-items: flex-start;
+        gap: 32px;
+
+        @media (max-width: 900px) {
+            flex-direction: column;
+        }
+    }
+
+    &__feed {
+        flex: 2;
+        min-width: 0;
+        width: 100%;
+
+        &__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+
+            & h2 {
+                margin: 24px 0;
+            }
+        }
+
+        &__link {
+            color: wheat;
+            font-size: 14px;
+            text-decoration: none;
+            transition: .2s;
+
+            &:hover {
+                opacity: .7;
+            }
+
+            & i {
+                margin-left: 4px;
+            }
+        }
+
+        &__list {
+            max-width: 700px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        &__loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        &__empty {
+            opacity: 0.6;
+            text-align: center;
+            margin-top: 16px;
+        }
+    }
+
+    &__trending {
+        flex: 1;
+        min-width: 0;
+        width: 100%;
+
+        &__header h2 {
+            margin: 24px 0;
+            text-align: left;
+        }
+
+        &__list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        &__item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        &__owner {
+            font-size: 12px;
+            opacity: 0.6;
+            margin-top: 6px;
+            text-align: right;
+        }
+
+        &__loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        &__empty {
+            opacity: 0.6;
+            margin-top: 16px;
+        }
+    }
+
     &__suggestions {
         width: 75%;
         margin-top: 24px;

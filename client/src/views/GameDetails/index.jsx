@@ -146,65 +146,69 @@ const handleToggleFavorite = async () => {
               )}
             </div>
 
-            <h4>Descripción:</h4>
+            <div className="game-details__content__grid">
+              <div className="game-details__content__main">
+                <h4>Descripción:</h4>
+                <p>{gameData.description_raw}</p>
+              </div>
 
-            <p>{gameData.description_raw}</p>
+              <aside className="game-details__content__side">
+                <h4>Géneros:</h4>
+                <div className="game-details__content__tags">
+                  {gameData.tags.map((tag) => (
+                    <span key={tag.id}>{tag.name}</span>
+                  ))}
+                </div>
 
-            <h4>Géneros:</h4>
+                <h4>Plataformas:</h4>
+                <div className="game-details__content__platforms">
+                  {gameData.platforms.map((platform) => (
+                    <span key={platform.platform.id}>{platform.platform.name}</span>
+                  ))}
+                </div>
 
-            <div className="game-details__content__tags">
-              {gameData.tags.map((tag) => (
-                <span key={tag.id}>{tag.name}</span>
-              ))}
+                <h4>Sitio web:</h4>
+                <div className="game-details__content__website">
+                  <a href={gameData.website}>{gameData.website}</a>
+                </div>
+              </aside>
             </div>
 
-            <h4>Plataformas:</h4>
+            <div className="game-details__content__reviews-section">
+              <h4>Reseñas populares:</h4>
 
-            <div className="game-details__content__platforms">
-              {gameData.platforms.map((platform) => (
-                <span key={platform.platform.id}>{platform.platform.name}</span>
-              ))}
+              <div className="game-details__content__reviews">
+                {reviewsState === "loading" && (
+                  <div className="game-details__content__loading">
+                    <Loader />
+                  </div>
+                )}
+
+                {reviewsError && (
+                  <div className="game-details__content__error">
+                    <span>
+                      <i className="fa-solid fa-bug fa-xl"></i>
+                    </span>
+                    <p>Ups! Ha ocurrido un error!</p>
+                    <p>{reviewsError.response?.data?.error || "Error desconocido"}</p>
+                  </div>
+                )}
+
+                {reviewsState === "success" &&
+                  reviewsData.map((review) => (
+                    <Review
+                      key={review._id}
+                      username={review.userId.username}
+                      imagen={review.userId.imagen}
+                      content={review.content}
+                      rating={review.rating}
+                      postId={review._id}
+                      likes={review.likes || []}
+                      onDelete={() => handleDelete(review._id)}
+                    />
+                  ))}
+              </div>
             </div>
-
-            <h4>Sitio web:</h4>
-
-            <div className="game-details__content__website">
-              <a href={gameData.website}>{gameData.website}</a>
-            </div>
-
-            <h4>Reseñas populares:</h4>
-
-<div className="game-details__content__reviews">
-  {reviewsState === "loading" && (
-    <div className="game-details__content__loading">
-      <Loader />
-    </div>
-  )}
-
-  {reviewsError && (
-    <div className="game-details__content__error">
-      <span>
-        <i className="fa-solid fa-bug fa-xl"></i>
-      </span>
-      <p>Ups! Ha ocurrido un error!</p>
-      <p>{reviewsError.response?.data?.error || "Error desconocido"}</p>
-    </div>
-  )}
-
-  {reviewsState === "success" &&
-    reviewsData.map((review) => (
-      <Review
-        key={review._id}
-        username={review.userId.username}
-        imagen={review.userId.imagen}
-        content={review.content}
-        rating={review.rating}
-        postId={review._id}
-        likes={review.likes || []}
-        onDelete={() => handleDelete(review._id)}
-      />
-    ))}
-</div>
           </div>
         </>
       ) : (
@@ -230,6 +234,7 @@ const handleToggleFavorite = async () => {
         title="Nueva reseña"
         isOpen={isOpen}
         setIsOpen={setIsOpen}
+        className="modal--dark"
       >
         <div className="new-review-modal">
           <div className="new-review-modal__rating">

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "./styles.scss";
 
 const PlaylistDetailModal = ({ playlist, onClose }) => {
@@ -6,6 +7,10 @@ const PlaylistDetailModal = ({ playlist, onClose }) => {
       <div className="pdm-modal" onClick={(e) => e.stopPropagation()}>
         <div className="pdm-modal__header">
           <div>
+            <p className="pdm-modal__count">
+              {playlist.games.length}{" "}
+              {playlist.games.length === 1 ? "juego" : "juegos"}
+            </p>
             <h3 className="pdm-modal__title">{playlist.name}</h3>
             {playlist.description && (
               <p className="pdm-modal__desc">{playlist.description}</p>
@@ -19,11 +24,18 @@ const PlaylistDetailModal = ({ playlist, onClose }) => {
         {playlist.games.length === 0 ? (
           <p className="pdm-modal__empty">Esta playlist no tiene juegos aún.</p>
         ) : (
-          <ul className="pdm-modal__list">
+          <ul className="pdm-modal__grid">
             {playlist.games.map((game) => (
-              <li key={game.gameId} className="pdm-modal__item">
-                <img src={game.imageUrl} alt={game.gameName} className="pdm-modal__cover" />
-                <span className="pdm-modal__name">{game.gameName}</span>
+              <li key={game.gameId}>
+                <Link
+                  to={`/game-details?id=${game.gameId}`}
+                  className="pdm-modal__poster"
+                  title={game.gameName}
+                  onClick={onClose}
+                >
+                  <img src={game.imageUrl} alt={game.gameName} />
+                  <span className="pdm-modal__poster-name">{game.gameName}</span>
+                </Link>
               </li>
             ))}
           </ul>

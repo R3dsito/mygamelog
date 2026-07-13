@@ -1,6 +1,6 @@
 import { useRef } from "react";
 
-const Modal = ({ children, isOpen, setIsOpen, title }) => {
+const Modal = ({ children, isOpen, setIsOpen, title, className = "" }) => {
   const modalRef = useRef(null);
 
   const handleCloseModal = (e) => {
@@ -22,7 +22,7 @@ const Modal = ({ children, isOpen, setIsOpen, title }) => {
       className={`modal-overlay${isOpen ? " modal-overlay--is-open" : ""}`}
       onClick={handleCloseModal}
     >
-      <div id="modal" className="modal">
+      <div id="modal" className={`modal${className ? ` ${className}` : ""}`}>
         <div className="modal__title">
           <p>{title}</p>
 

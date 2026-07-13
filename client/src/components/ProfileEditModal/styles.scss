@@ -1,226 +1,297 @@
-.pem {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  min-width: 420px;
+// Scoped under `.modal.modal--dark` (two classes) so these rules win over the
+// shared Modal's global `.modal input` / `.modal form` / `.modal div img` styles.
+.modal.modal--dark {
+  background-color: rgb(2, 22, 3);
+  border: 2px solid wheat;
 
-  &__tabs {
-    display: flex;
-    border-bottom: 2px solid #eee;
-    gap: 4px;
+  .modal__title p,
+  .modal__close-button i {
+    color: wheat;
   }
 
-  &__tab {
-    background: none;
-    border: none;
-    padding: 8px 18px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #888;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -2px;
-    transition: color 0.15s, border-color 0.15s;
-
-    &--active {
-      color: #021603;
-      border-bottom-color: #021603;
-    }
-
-    &:hover:not(&--active) { color: #444; }
-  }
-
-  &__form {
+  .pem {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-  }
+    gap: 16px;
+    min-width: 420px;
 
-  // ── Imágenes ──────────────────────────────────
-  &__banner {
-    position: relative;
-    height: 90px;
-    border-radius: 10px;
-    overflow: hidden;
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-  }
-
-  &__avatar {
-    position: relative;
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    overflow: hidden;
-    margin-top: -40px;
-    margin-left: 12px;
-    border: 3px solid #fff;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-  }
-
-  &__overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.2s;
-
-    i { color: #fff; font-size: 20px; }
-
-    &:hover { opacity: 1; }
-
-    &--small i { font-size: 14px; }
-  }
-
-  // ── Campos ────────────────────────────────────
-  &__fields {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-
-    &--password {
-      margin-top: 8px;
-    }
-  }
-
-  &__field {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-
-    label {
-      font-size: 12px;
-      font-weight: 600;
-      color: #555;
+    &__tabs {
       display: flex;
-      justify-content: space-between;
+      gap: 4px;
+      border-bottom: 1px solid rgba(245, 222, 179, 0.3);
     }
 
-    input, textarea {
-      padding: 9px 12px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 14px;
-      color: #021603;
-      outline: none;
-      transition: border-color 0.15s;
-      font-family: inherit;
-
-      &:focus { border-color: #021603; }
-    }
-
-    textarea { resize: vertical; }
-  }
-
-  &__input-prefix {
-    display: flex;
-    align-items: center;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    overflow: hidden;
-    transition: border-color 0.15s;
-
-    &:focus-within { border-color: #021603; }
-
-    span {
-      padding: 9px 10px;
-      font-size: 14px;
-      color: #888;
-      background: #f5f5f5;
-      border-right: 1px solid #ddd;
-    }
-
-    input {
+    &__tab {
+      background: none;
       border: none;
-      border-radius: 0;
-      flex: 1;
-      &:focus { border-color: transparent; }
+      padding: 8px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      color: wheat;
+      opacity: 0.5;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: opacity 0.15s, border-color 0.15s;
+
+      &--active {
+        opacity: 1;
+        border-bottom-color: wheat;
+      }
+
+      &:hover:not(&--active) {
+        opacity: 0.8;
+      }
     }
-  }
 
-  &__char-count {
-    font-size: 11px;
-    font-weight: 400;
-    color: #aaa;
-  }
-
-  &__field-hint {
-    font-size: 11px;
-    color: #c0392b;
-    margin-top: 2px;
-  }
-
-  // ── Password strength ─────────────────────────
-  &__pw-strength {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 4px;
-
-    span {
-      font-size: 11px;
-      color: #666;
+    &__form {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+      width: 100%;
     }
-  }
 
-  &__pw-bar {
-    height: 4px;
-    width: 80px;
-    border-radius: 4px;
-    background: #eee;
-    position: relative;
-    overflow: hidden;
+    // ── Imágenes ──────────────────────────────────
+    &__banner {
+      position: relative;
+      height: 90px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(245, 222, 179, 0.3);
 
-    &::after {
-      content: "";
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    &__avatar {
+      position: relative;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-top: -40px;
+      margin-left: 12px;
+      border: 3px solid wheat;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    &__overlay {
       position: absolute;
       inset: 0;
-      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s;
+
+      i {
+        color: #fff;
+        font-size: 20px;
+      }
+
+      &:hover {
+        opacity: 1;
+      }
+
+      &--small i {
+        font-size: 14px;
+      }
     }
 
-    &--weak::after    { width: 33%; background: #e74c3c; }
-    &--medium::after  { width: 66%; background: #f39c12; }
-    &--strong::after  { width: 100%; background: #27ae60; }
-  }
+    // ── Campos ────────────────────────────────────
+    &__fields {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
 
-  // ── Mensajes ──────────────────────────────────
-  &__msg {
-    font-size: 13px;
-    padding: 8px 12px;
-    border-radius: 6px;
+      &--password {
+        margin-top: 8px;
+      }
+    }
 
-    &--error   { background: #fdecea; color: #c0392b; }
-    &--success { background: #eafaf1; color: #1e8449; }
-  }
+    &__field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
 
-  // ── Submit ────────────────────────────────────
-  &__submit {
-    background: #021603;
-    color: wheat;
-    border: none;
-    border-radius: 20px;
-    padding: 10px 24px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    align-self: flex-end;
-    transition: opacity 0.15s;
+      label {
+        font-size: 12px;
+        font-weight: 600;
+        color: wheat;
+        opacity: 0.8;
+        display: flex;
+        justify-content: space-between;
+      }
 
-    &:hover { opacity: 0.85; }
-    &:disabled { opacity: 0.5; cursor: not-allowed; }
+      input,
+      textarea {
+        width: 100%;
+        padding: 9px 12px;
+        background: transparent;
+        border: 2px solid rgba(245, 222, 179, 0.4);
+        border-radius: 8px;
+        font-size: 14px;
+        color: wheat;
+        outline: none;
+        margin-bottom: 0;
+        transition: border-color 0.15s;
+        font-family: inherit;
+
+        &::placeholder {
+          color: wheat;
+          opacity: 0.4;
+        }
+
+        &:focus {
+          border-color: wheat;
+        }
+      }
+
+      textarea {
+        resize: vertical;
+      }
+    }
+
+    &__input-prefix {
+      display: flex;
+      align-items: center;
+      border: 2px solid rgba(245, 222, 179, 0.4);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: border-color 0.15s;
+
+      &:focus-within {
+        border-color: wheat;
+      }
+
+      span {
+        padding: 9px 12px;
+        font-size: 14px;
+        color: wheat;
+        opacity: 0.7;
+        background: rgba(245, 222, 179, 0.1);
+        border-right: 2px solid rgba(245, 222, 179, 0.4);
+      }
+
+      input {
+        border: none;
+        border-radius: 0;
+        margin-bottom: 0;
+        flex: 1;
+
+        &:focus {
+          border-color: transparent;
+        }
+      }
+    }
+
+    &__char-count {
+      font-size: 11px;
+      font-weight: 400;
+      color: wheat;
+      opacity: 0.5;
+    }
+
+    &__field-hint {
+      font-size: 11px;
+      color: #e05c7a;
+      margin-top: 2px;
+    }
+
+    // ── Password strength ─────────────────────────
+    &__pw-strength {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+
+      span {
+        font-size: 11px;
+        color: wheat;
+        opacity: 0.7;
+      }
+    }
+
+    &__pw-bar {
+      height: 4px;
+      width: 80px;
+      border-radius: 4px;
+      background: rgba(245, 222, 179, 0.15);
+      position: relative;
+      overflow: hidden;
+
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 4px;
+      }
+
+      &--weak::after {
+        width: 33%;
+        background: #e74c3c;
+      }
+
+      &--medium::after {
+        width: 66%;
+        background: #f39c12;
+      }
+
+      &--strong::after {
+        width: 100%;
+        background: #2b8c69;
+      }
+    }
+
+    // ── Mensajes ──────────────────────────────────
+    &__msg {
+      font-size: 13px;
+      padding: 8px 12px;
+      border-radius: 6px;
+
+      &--error {
+        background: rgba(224, 92, 122, 0.15);
+        color: #e05c7a;
+      }
+
+      &--success {
+        background: rgba(43, 140, 105, 0.2);
+        color: #7bd0a0;
+      }
+    }
+
+    // ── Submit ────────────────────────────────────
+    &__submit {
+      background: transparent;
+      color: wheat;
+      border: 2px solid wheat;
+      border-radius: 20px;
+      padding: 9px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      align-self: flex-end;
+      transition: background 0.15s;
+
+      &:hover {
+        background: rgba(245, 222, 179, 0.15);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
   }
 }

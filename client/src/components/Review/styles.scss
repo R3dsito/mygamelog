@@ -2,26 +2,23 @@
     display: flex;
     border: 2px solid wheat;
     border-radius: 10px;
-    max-height: 250px;
     overflow: hidden;
 
     &__image-container {
-        width: 230px;
-        height: 200px;
+        width: 130px;
+        flex-shrink: 0;
+        display: flex;
     }
 
     &__image {
         width: 100%;
-        height: 100%;
         cursor: pointer;
+        display: flex;
     }
 
     &__image img {
         width: 100%;
-        height: 100%;
         object-fit: cover;
-        border-top-left-radius: 10px;
-        border-bottom-left-radius: 10px;
         border-right: 2px solid wheat;
     }
 
@@ -31,51 +28,107 @@
         padding: 16px;
         text-align: left;
         flex: 1;
+        min-width: 0;
+        gap: 12px;
     }
 
-    &__content h4 {
-        margin-bottom: 8px;
-    }
-
-    
-    &__content h4:hover {
-        cursor: pointer;
-        opacity: 75%;
-    }
-
-    &__content p {
-        flex: 1;
-        font-size: 14px;
-    }
-
-    &__actions {
-        margin-top: 32px;
+    &__header {
         display: flex;
-        justify-content: space-between;
         align-items: center;
-
-        & > span i {
-            margin-right: 8px;
-        }
-
-        &__right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        gap: 12px;
     }
 
-    &__content span {
-        cursor: default;
-    }
-
-    &__content button {
-        background-color: unset;
-        border: none;
+    &__avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
         cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(245, 222, 179, 0.15);
+        border: 1px solid rgba(245, 222, 179, 0.3);
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        i {
+            color: wheat;
+            opacity: 0.5;
+        }
+    }
+
+    &__meta {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    &__game {
+        margin: 0;
+        cursor: pointer;
+
+        &:hover {
+            opacity: 0.75;
+        }
+    }
+
+    &__byline {
+        font-size: 13px;
+        opacity: 0.85;
         display: flex;
         align-items: center;
         gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    &__user {
+        font-weight: 700;
+        cursor: pointer;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    &__stars {
+        color: wheat;
+        font-size: 11px;
+        letter-spacing: 1px;
+        margin-left: 2px;
+        white-space: nowrap;
+    }
+
+    &__text {
+        font-size: 14px;
+        line-height: 1.5;
+        margin: 0;
+        flex: 1;
+    }
+
+    &__footer {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-top: 4px;
+    }
+
+    &__footer button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: wheat;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        padding: 0;
 
         &:hover {
             text-decoration: underline;
@@ -83,7 +136,7 @@
     }
 
     &__like {
-        opacity: 0.5;
+        opacity: 0.6;
         transition: opacity 0.15s;
 
         &:hover {
@@ -95,7 +148,7 @@
             opacity: 1;
 
             & i,
-            & span {
+            & .review__like-count {
                 color: #e05c7a;
             }
         }

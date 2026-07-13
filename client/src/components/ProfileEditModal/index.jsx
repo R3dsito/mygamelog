@@ -2,10 +2,8 @@ import { useState, useContext } from "react";
 import api from "@/api/axiosInstance";
 import { AuthContext } from "@/contexts/AuthContext";
 import Modal from "@/components/Modal";
+import { DEFAULT_AVATAR, DEFAULT_BANNER } from "@/constants/media";
 import "./styles.scss";
-
-const PROFILE_PICTURE = "https://pbs.twimg.com/media/Fvpd8chWcAEPllN.jpg";
-const DEFAULT_BANNER = "https://image.tensorartassets.com/cdn-cgi/image/anim=true,plain=false,w=2048,f=jpeg,q=85/posts/images/646889879699062307/8f152d51-dd42-404f-898d-8a1c38f12a6b.jpg";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -116,7 +114,7 @@ const ProfileEditModal = ({ isOpen, setIsOpen, userData, onSaved }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} setIsOpen={setIsOpen} title="Editar perfil">
+    <Modal isOpen={isOpen} setIsOpen={setIsOpen} title="Editar perfil" className="modal--dark">
       <div className="pem">
         {/* Tabs */}
         <div className="pem__tabs">
@@ -150,7 +148,7 @@ const ProfileEditModal = ({ isOpen, setIsOpen, userData, onSaved }) => {
 
             {/* Avatar */}
             <div className="pem__avatar">
-              <img src={previewAvatar || userData?.imagen || PROFILE_PICTURE} alt="Avatar" />
+              <img src={previewAvatar || userData?.imagen || DEFAULT_AVATAR} alt="Avatar" />
               <label className="pem__overlay pem__overlay--small" title="Cambiar foto">
                 <i className="fa-solid fa-camera" />
                 <input type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={handleAvatarChange} />

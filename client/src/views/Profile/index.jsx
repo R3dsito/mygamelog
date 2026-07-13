@@ -16,11 +16,7 @@ import useToggleFavorite from "@/hooks/useToggleFavorite";
 import useGetFavorites from "@/hooks/useGetFavorites";
 import useGetUserPlaylists from "@/hooks/useGetUserPlaylists";
 import useManagePlaylists from "@/hooks/useManagePlaylists";
-
-
-
-
-const PROFILE_PICTURE = "https://pbs.twimg.com/media/Fvpd8chWcAEPllN.jpg";
+import { DEFAULT_AVATAR, DEFAULT_BANNER } from "@/constants/media";
 
 const Profile = () => {
   const { user: loggedInUser, setUser } = useContext(AuthContext);
@@ -191,12 +187,12 @@ const handleProfileSaved = (newUsername) => {
         <div
           className="profile__header__images"
           style={{
-            backgroundImage: `url(${userData?.bannerImage || "https://image.tensorartassets.com/cdn-cgi/image/anim=true,plain=false,w=2048,f=jpeg,q=85/posts/images/646889879699062307/8f152d51-dd42-404f-898d-8a1c38f12a6b.jpg"})`,
+            backgroundImage: `url(${userData?.bannerImage || DEFAULT_BANNER})`,
           }}
         >
           <div>
               <img
-      src={userData?.imagen || PROFILE_PICTURE}
+      src={userData?.imagen || DEFAULT_AVATAR}
       alt="Profile"
     />
 
@@ -367,7 +363,7 @@ const handleProfileSaved = (newUsername) => {
           <Link to={`/profile/username/${user.username}`} onClick={() => setIsOpen(false)}>
           <li className="modal__followers" key={user._id}><div>
             <img className="userImage"
-  src={user.imagen || PROFILE_PICTURE}
+  src={user.imagen || DEFAULT_AVATAR}
   alt="Profile"
 />
           </div>{user.username}</li>
@@ -392,7 +388,7 @@ const handleProfileSaved = (newUsername) => {
           <Link to={`/profile/username/${user.username}`} onClick={() => setIsOpen(false)}>
   <li className="modal__followers" key={user._id}><div>
             <img className="userImage"
-  src={user.imagen || PROFILE_PICTURE}
+  src={user.imagen || DEFAULT_AVATAR}
   alt="Profile"
 />
           </div>{user.username}</li>

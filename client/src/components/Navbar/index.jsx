@@ -4,8 +4,7 @@ import { AuthContext } from "@/contexts/AuthContext";
 import useSearchUsers from "@/hooks/useSearchUsers";
 import useDebounce from "@/hooks/useDebounce";
 import LOGO from "@/assets/my-game-log-logo.png";
-
-const PROFILE_PICTURE = "https://pbs.twimg.com/media/Fvpd8chWcAEPllN.jpg";
+import { DEFAULT_AVATAR } from "@/constants/media";
 
 const Navbar = () => {
   const { user, logoutUser } = useContext(AuthContext);
@@ -67,7 +66,7 @@ const Navbar = () => {
                 className="navbar__search__result"
                 onClick={() => handleSelectUser(u.username)}
               >
-                <img src={u.imagen || PROFILE_PICTURE} alt={u.username} />
+                <img src={u.imagen || DEFAULT_AVATAR} alt={u.username} />
                 <p>{u.username}</p>
               </div>
             ))}
