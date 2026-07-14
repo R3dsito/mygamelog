@@ -1,6 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import { userRoutes, projectroutes, taskroutes, gameRoutes, postRoutes, playlistRoutes } from './routes/index.js';
+import { userRoutes, gameRoutes, postRoutes, playlistRoutes } from './routes/index.js';
 import 'dotenv/config';
 import cors from "cors"
 import { connectDB } from "./db/mongoose.js";
@@ -34,16 +34,17 @@ app.use(async (req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.get('/',(req, res) => {
-    res.send("kanban database");
+    res.send("myGameLog API");
 });
 app.use('/posts' , postRoutes)
 app.use('/games', gameRoutes);
 app.use('/users', userRoutes);
 app.use('/playlists', playlistRoutes);
-app.use('/projects', projectroutes);
-app.use('/tasks', taskroutes);
- export default app;
+if (!process.env.VERCEL) {
+  const port = process.env.PORT || 3002;
+  app.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+  });
+}
 
-   const port = process.env.PORT || 3002;
-   app.listen(port, () => {
-      })
+export default app;

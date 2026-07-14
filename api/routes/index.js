@@ -1,7 +1,4 @@
 export {userRoutes} from "./users_routes.js"
-export {projectroutes} from "./projects.js"
-export {taskroutes} from "./tasks.js"
 export {gameRoutes} from "./gameRoutes.js"
 export {postRoutes} from "./postRoutes.js"
-export {randomRoutes} from "./randomRoutes.js"
 export {playlistRoutes} from "./playlistRoutes.js"
