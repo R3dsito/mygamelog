@@ -9,7 +9,6 @@ import api from "@/api/axiosInstance";
 import useGetGame from "@/hooks/useGetGame";
 import useGetReviews from "@/hooks/useGetReviews";
 import usePostReview from "@/hooks/usePostReview";
-import useDeleteReview from "@/hooks/useDeleteReview";
 import useToggleFavorite from "@/hooks/useToggleFavorite";
 import useGetGameScore from "@/hooks/useGetGameScore";
 
@@ -32,7 +31,6 @@ const loadDraft = (gameId) => {
 const GameDetails = () => {
   const [searchParams] = useSearchParams();
   const { user } = useContext(AuthContext);
-  const { deleteReview } = useDeleteReview();
   const id = searchParams.get("id");
   const { toggleFavorite, loading } = useToggleFavorite();
   const [isFavorite, setIsFavorite] = useState(false);
@@ -46,6 +44,8 @@ const [reviewData, setReviewData] = useState({
 });
 const [reviewError, setReviewError] = useState("");
 const [editingPostId, setEditingPostId] = useState(null);
+const [submitting, setSubmitting] = useState(false);
+const [confirmDelete, setConfirmDelete] = useState(false);
 
   const {
     state: gameState,
@@ -79,19 +79,119 @@ const [editingPostId, setEditingPostId] = useState(null);
     rating: reviewData?.score,
   });
 
-  const handleDelete = async (reviewId) => {
-  await deleteReview(reviewId);
-  getReviews();
-};
+  const refreshGameData = () => {
+    getReviews();
+    fetchScore(id);
+  };
 
-const handleToggleFavorite = async () => {
-  try {
-    const res = await toggleFavorite({ userId: user.id, gameId: gameData.id });
-    setIsFavorite(res?.isFavorite ?? false);
-  } catch (err) {
-    console.error("Error al togglear favorito:", err);
-  }
-};
+  const resetForm = () => {
+    setEditingPostId(null);
+    setReviewData({ score: 0, review: "", addToFavorites: false });
+    setIsFavorite(false);
+    setConfirmDelete(false);
+    setReviewError("");
+  };
+
+  const handleDelete = async (reviewId) => {
+    try {
+      await api.delete(`/posts/${reviewId}`);
+      if (reviewId === editingPostId) {
+        resetForm();
+        clearDraft(id);
+      }
+      refreshGameData();
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  // Los favoritos apuntan a un post, así que solo se pueden aplicar si ya existe.
+  // En modo creación se difiere hasta después de publicar.
+  const handleFavoriteClick = async () => {
+    if (!editingPostId) {
+      setReviewData((prev) => ({ ...prev, addToFavorites: !prev.addToFavorites }));
+      return;
+    }
+    try {
+      const res = await toggleFavorite({ userId: user.id, postId: editingPostId });
+      setIsFavorite(res?.isFavorite ?? !isFavorite);
+    } catch {
+      setReviewError("No se pudo actualizar favoritos.");
+    }
+  };
+
+  const handleSubmit = async () => {
+    setReviewError("");
+    if (!reviewData.score) {
+      return setReviewError("Elegí una puntuación del 1 al 10.");
+    }
+
+    setSubmitting(true);
+    try {
+      if (editingPostId) {
+        await api.put(`/posts/${editingPostId}`, {
+          content: reviewData.review.trim(),
+          rating: reviewData.score,
+        });
+      } else {
+        const newPost = await postReview();
+        if (newPost?._id) {
+          setEditingPostId(newPost._id);
+          if (reviewData.addToFavorites) {
+            const res = await toggleFavorite({ userId: user.id, postId: newPost._id });
+            setIsFavorite(res?.isFavorite ?? true);
+          }
+        }
+        clearDraft(id);
+      }
+      refreshGameData();
+      setIsOpen(false);
+    } catch (err) {
+      const status = err?.response?.status;
+      if (status === 409) {
+        try {
+          const res = await api.get(`/posts/user/${user.id}/game/${gameData.id}`);
+          const existing = res.data;
+          setEditingPostId(existing._id);
+          setReviewData({
+            score: existing.rating,
+            review: existing.content || "",
+            addToFavorites: false,
+          });
+          setReviewError("Ya tenías un registro para este juego. Podés editarlo acá.");
+        } catch {
+          setReviewError("Ya registraste este juego.");
+        }
+      } else if (status === 400) {
+        setReviewError(err.response?.data?.error || "Datos inválidos.");
+      } else if (status === 401) {
+        setReviewError("Tu sesión expiró. Iniciá sesión nuevamente.");
+      } else if (!err?.response) {
+        setReviewError("Sin conexión al servidor. Verificá tu internet e intentá de nuevo.");
+      } else {
+        setReviewError("No se pudo guardar. Intentá de nuevo.");
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDeleteFromModal = async () => {
+    setSubmitting(true);
+    const ok = await handleDelete(editingPostId);
+    setSubmitting(false);
+    if (ok) setIsOpen(false);
+    else setReviewError("No se pudo eliminar el registro.");
+  };
+
+  const favoriteActive = editingPostId ? isFavorite : reviewData.addToFavorites;
+
+  const submitLabel = editingPostId
+    ? "Guardar cambios"
+    : reviewData.review.trim()
+      ? "Publicar reseña"
+      : "Guardar puntuación";
 
   const handleScoreChange = (score) => {
     setReviewData((prev) => {
@@ -118,7 +218,12 @@ const handleToggleFavorite = async () => {
         api.get(`/posts/user/${user.id}/game/${id}`).then((res) => {
           const existing = res.data;
           setEditingPostId(existing._id);
-          setReviewData({ score: existing.rating, review: existing.content, addToFavorites: false });
+          setReviewData({
+            score: existing.rating,
+            review: existing.content || "",
+            addToFavorites: false,
+          });
+          setIsFavorite(user?.favorites?.includes(existing._id) ?? false);
         }).catch(() => {
           const draft = loadDraft(id);
           if (draft) setReviewData((prev) => ({ ...prev, ...draft }));
@@ -137,6 +242,7 @@ const handleToggleFavorite = async () => {
   useEffect(() => {
     if (!isOpen) {
       setReviewError("");
+      setConfirmDelete(false);
     }
   }, [isOpen]);
 
@@ -153,39 +259,67 @@ const handleToggleFavorite = async () => {
               url(${gameData.background_image})
             `,
               }}
-            >
-              <h1>
-                {gameData.name}
-                <span> ({dayjs(gameData.released).format("YYYY")})</span>
-              </h1>
-              <div className="game-details__score">
-                <i className="fa-solid fa-star" />
-                {gameScore.totalReviews > 0
-                  ? <><strong>{gameScore.averageScore.toFixed(1)}</strong><span>/10 · {gameScore.totalReviews} {gameScore.totalReviews === 1 ? "reseña" : "reseñas"} en mygamelog</span></>
-                  : <span>Sin reseñas en mygamelog aún</span>
-                }
-              </div>
-              <div>
-                {gameData.publishers.map((publisher, index) => (
-                  <Fragment key={publisher.id}>
-                    <span>{publisher.name}</span>
-                    {index < gameData.publishers.length - 1 && " - "}
-                  </Fragment>
-                ))}
-              </div>
-            </div>
+            />
           </div>
 
           <div className="game-details__content">
-            <div className="game-details__content__actions">
-              <button onClick={() => setIsOpen(true)}>
-                {editingPostId ? "Editar reseña" : "Nueva reseña"}
-              </button>
-              {user && (
-                <button onClick={() => setShowPlaylistModal(true)}>
-                  <i className="fa-solid fa-bookmark" /> Playlist
-                </button>
-              )}
+            <div className="game-details__hero">
+              <div className="game-details__poster">
+                {gameData.cover ? (
+                  <img src={gameData.cover} alt={`Portada de ${gameData.name}`} />
+                ) : (
+                  <div className="game-details__poster__empty">
+                    <i className="fa-solid fa-gamepad" />
+                  </div>
+                )}
+              </div>
+
+              <div className="game-details__intro">
+                <h1>
+                  {gameData.website ? (
+                    <a
+                      className="game-details__title-link"
+                      href={gameData.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {gameData.name}
+                      <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" />
+                    </a>
+                  ) : (
+                    gameData.name
+                  )}
+                  <span> ({dayjs(gameData.released).format("YYYY")})</span>
+                </h1>
+
+                <div className="game-details__score">
+                  <i className="fa-solid fa-star" />
+                  {gameScore.totalReviews > 0
+                    ? <><strong>{gameScore.averageScore.toFixed(1)}</strong><span>/10 · {gameScore.totalReviews} {gameScore.totalReviews === 1 ? "reseña" : "reseñas"} en mygamelog</span></>
+                    : <span>Sin reseñas en mygamelog aún</span>
+                  }
+                </div>
+
+                <p className="game-details__publishers">
+                  {gameData.publishers.map((publisher, index) => (
+                    <Fragment key={publisher.id}>
+                      <span>{publisher.name}</span>
+                      {index < gameData.publishers.length - 1 && " · "}
+                    </Fragment>
+                  ))}
+                </p>
+
+                <div className="game-details__content__actions">
+                  <button onClick={() => setIsOpen(true)}>
+                    {editingPostId ? "Editar registro" : "Registrar juego"}
+                  </button>
+                  {user && (
+                    <button onClick={() => setShowPlaylistModal(true)}>
+                      <i className="fa-solid fa-bookmark" /> Playlist
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
 
             <div className="game-details__content__grid">
@@ -276,117 +410,117 @@ const handleToggleFavorite = async () => {
 
       <Modal
         closable
-        title={editingPostId ? "Editar reseña" : "Nueva reseña"}
+        title={editingPostId ? "Editar registro" : "Registrar juego"}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
         className="modal--dark"
       >
-        <div className="new-review-modal">
-          <div className="new-review-modal__rating">
-            {Array.from({ length: 10 }).map((_, index) => {
-              const starIndex = index + 1;
+        <div className="log-modal">
+          <section className="log-modal__section">
+            <div className="log-modal__label-row">
+              <span className="log-modal__label">Tu puntuación</span>
+              <span className="log-modal__score">
+                {reviewData.score ? `${reviewData.score}/10` : "—"}
+              </span>
+            </div>
 
-              return (
-                <button
-                  key={index}
-                  type="button"
-                  onClick={() => handleScoreChange(starIndex)}
-                  className={`star-button ${
-                    starIndex <= reviewData.score ? "active" : ""
-                  }`}
-                  aria-label={`Calificar ${starIndex} de 10`}
-                >
-                  <i
-                    className={`fa-${
-                      starIndex <= reviewData.score ? "solid" : "regular"
-                    } fa-star`}
-                  ></i>
-                </button>
-              );
-            })}
-          </div>
+            <div className="log-modal__stars">
+              {Array.from({ length: 10 }).map((_, index) => {
+                const starIndex = index + 1;
+                const filled = starIndex <= reviewData.score;
 
-          <textarea
-            placeholder="Escribe una reseña"
-            value={reviewData.review}
-            onChange={handleReviewChange}
-            aria-label="Escribe una reseña"
-          ></textarea>
+                return (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => handleScoreChange(starIndex)}
+                    className={`star-button ${filled ? "active" : ""}`}
+                    aria-label={`Calificar ${starIndex} de 10`}
+                  >
+                    <i className={`fa-${filled ? "solid" : "regular"} fa-star`} />
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="log-modal__section">
+            <div className="log-modal__label-row">
+              <label className="log-modal__label" htmlFor="log-modal-text">
+                Reseña
+              </label>
+              <span className="log-modal__optional">Opcional</span>
+            </div>
+
+            <textarea
+              id="log-modal-text"
+              placeholder="¿Qué te pareció? Podés dejarlo vacío y guardar solo la puntuación."
+              value={reviewData.review}
+              onChange={handleReviewChange}
+              maxLength={5000}
+              rows={5}
+            />
+
+            {reviewData.review.length > 0 && (
+              <span className="log-modal__counter">
+                {reviewData.review.length}/5000
+              </span>
+            )}
+          </section>
 
           <button
-            className={`favorite-toggle ${reviewData.addToFavorites ? "active" : ""}`}
-            onClick={() =>
-              setReviewData({
-                ...reviewData,
-                addToFavorites: !reviewData.addToFavorites,
-              })
-            }
+            type="button"
+            className={`favorite-toggle ${favoriteActive ? "active" : ""}`}
+            onClick={handleFavoriteClick}
+            disabled={loading}
           >
-            {reviewData.addToFavorites ? "Quitar de favoritos" : "Agregar a favoritos"}
-            <i
-            className={`fa-${isFavorite ? "solid" : "regular"} fa-heart`}
-          ></i>
+            <i className={`fa-${favoriteActive ? "solid" : "regular"} fa-heart`} />
+            {favoriteActive ? "En favoritos" : "Marcar como favorito"}
           </button>
 
+          {reviewError && <p className="log-modal__error">{reviewError}</p>}
 
-{reviewError && <p className="new-review-modal__error">{reviewError}</p>}
+          <button
+            type="button"
+            className="log-modal__submit"
+            onClick={handleSubmit}
+            disabled={submitting || !reviewData.score}
+          >
+            {submitting ? "Guardando..." : submitLabel}
+          </button>
 
-<button
-  onClick={async () => {
-    setReviewError("");
-    if (!reviewData.score || reviewData.score < 1) {
-      return setReviewError("Seleccioná una puntuación antes de publicar.");
-    }
-    if (!reviewData.review.trim()) {
-      return setReviewError("Escribí algo en la reseña antes de publicar.");
-    }
-    try {
-      if (editingPostId) {
-        await api.put(`/posts/${editingPostId}`, {
-          content: reviewData.review,
-          rating: reviewData.score,
-        });
-        getReviews();
-        fetchScore(id);
-        setIsOpen(false);
-        return;
-      }
-
-      const newPost = await postReview();
-      getReviews();
-      clearDraft(id);
-
-      if (reviewData.addToFavorites && newPost?._id) {
-        const res = await toggleFavorite({ userId: user.id, postId: newPost._id });
-        setIsFavorite(res.isFavorite);
-      }
-
-      setIsOpen(false);
-      setReviewData({ score: 0, review: "", addToFavorites: false });
-    } catch (err) {
-      const status = err?.response?.status;
-      if (status === 409) {
-        try {
-          const res = await api.get(`/posts/user/${user.id}/game/${gameData.id}`);
-          const existing = res.data;
-          setEditingPostId(existing._id);
-          setReviewData({ score: existing.rating, review: existing.content, addToFavorites: false });
-          setReviewError("Ya tenés una reseña para este juego. Podés editarla a continuación.");
-        } catch {
-          setReviewError("Ya publicaste una reseña para este juego.");
-        }
-      } else if (status === 401) {
-        setReviewError("Tu sesión expiró. Iniciá sesión nuevamente.");
-      } else if (!err?.response) {
-        setReviewError("Sin conexión al servidor. Verificá tu internet e intentá de nuevo.");
-      } else {
-        setReviewError("No se pudo publicar la reseña. Intentá de nuevo.");
-      }
-    }
-  }}
->
-  {editingPostId ? "Guardar cambios" : "¡Publicar!"}
-</button>
+          {editingPostId && (
+            <div className="log-modal__danger">
+              {confirmDelete ? (
+                <>
+                  <span className="log-modal__danger-text">
+                    ¿Eliminar tu registro de este juego?
+                  </span>
+                  <div className="log-modal__danger-actions">
+                    <button type="button" onClick={() => setConfirmDelete(false)}>
+                      Cancelar
+                    </button>
+                    <button
+                      type="button"
+                      className="log-modal__danger-confirm"
+                      onClick={handleDeleteFromModal}
+                      disabled={submitting}
+                    >
+                      Sí, eliminar
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  className="log-modal__danger-trigger"
+                  onClick={() => setConfirmDelete(true)}
+                >
+                  <i className="fa-solid fa-trash" aria-hidden="true" /> Eliminar registro
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </Modal>
     </div>

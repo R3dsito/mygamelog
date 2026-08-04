@@ -4,6 +4,7 @@ import 'dotenv/config';
 import jwt from 'jsonwebtoken';
 import Posts from "../models/Post.js";
 import cloudinary from "../config/cloudinary.js";
+import { fetchCoversByGameIds } from "../services/igdbService.js";
 
 const isValidObjectId = (id) => /^[a-f\d]{24}$/i.test(id);
 
@@ -363,7 +364,22 @@ const getFavorites = async (req, res) => {
     const user = await Users.findById(userId).populate("favorites");
     if (!user) return res.status(404).json({ message: "Usuario no encontrado" });
 
-    res.json(user.favorites);
+    const favorites = user.favorites.map((fav) => fav.toObject());
+
+    // El cover es decorativo: si IGDB falla, los favoritos igual se devuelven.
+    let covers = new Map();
+    try {
+      covers = await fetchCoversByGameIds(favorites.map((fav) => fav.gameId));
+    } catch (error) {
+      console.error("No se pudieron obtener covers de IGDB:", error.message);
+    }
+
+    res.json(
+      favorites.map((fav) => ({
+        ...fav,
+        cover: covers.get(String(fav.gameId)) || null,
+      }))
+    );
   } catch (error) {
     console.error("Error al obtener favoritos:", error);
     res.status(500).json({ message: "Error del servidor al obtener favoritos" });

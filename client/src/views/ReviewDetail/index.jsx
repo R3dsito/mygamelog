@@ -93,7 +93,13 @@ const ReviewDetail = () => {
           </div>
         )}
 
-        <p className="review-detail__content">{content}</p>
+        {content?.trim() ? (
+          <p className="review-detail__content">{content}</p>
+        ) : (
+          <p className="review-detail__no-content">
+            Sin reseña escrita — solo puntuación.
+          </p>
+        )}
 
         <div className="review-detail__footer">
           <button

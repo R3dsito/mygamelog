@@ -1,17 +1,39 @@
 import Post from "../models/Post.js";
 import { onReviewCreated, onReviewUpdated, onReviewDeleted, getGameScore } from "../services/gameScoreService.js";
 
+// Acepta valores 1-10; cualquier otra cosa (0, texto, vacío) es inválida.
+const parseRating = (value) => {
+  const rating = Number(value);
+  return Number.isInteger(rating) && rating >= 1 && rating <= 10 ? rating : null;
+};
+
 export const createPost = async (req, res) => {
   try {
     const { gameId, gameName, imageUrl, content, rating } = req.body;
+
+    const parsedRating = parseRating(rating);
+    if (parsedRating === null) {
+      return res.status(400).json({ error: "La puntuación debe ser un número del 1 al 10." });
+    }
+
     const userId = req.usuario._id;
-    const newPost = new Post({ gameId, userId, gameName, imageUrl, content, rating });
+    const newPost = new Post({
+      gameId,
+      userId,
+      gameName,
+      imageUrl,
+      content: (content || "").trim(),
+      rating: parsedRating,
+    });
     await newPost.save();
-    await onReviewCreated(gameId, rating ?? 0);
+    await onReviewCreated(gameId, parsedRating);
     res.status(201).json(newPost);
   } catch (error) {
     if (error.code === 11000) {
       return res.status(409).json({ error: "Ya existe una review tuya para este juego." });
+    }
+    if (error.name === "ValidationError") {
+      return res.status(400).json({ error: "Datos inválidos para crear el post." });
     }
     res.status(500).json({ error: "Error al crear el post." });
   }
@@ -37,15 +59,26 @@ export const updatePost = async (req, res) => {
     }
     const { content, rating } = req.body;
     const oldRating = post.rating ?? 0;
-    const newRating = rating ?? oldRating;
-    const updatedPost = await Post.findByIdAndUpdate(
-      id,
-      { content, rating: newRating },
-      { new: true }
-    );
+
+    const newRating = rating === undefined ? oldRating : parseRating(rating);
+    if (newRating === null) {
+      return res.status(400).json({ error: "La puntuación debe ser un número del 1 al 10." });
+    }
+
+    // content ausente conserva el texto; "" lo borra (pasa a ser solo puntuación).
+    const update = { rating: newRating };
+    if (content !== undefined) update.content = String(content).trim();
+
+    const updatedPost = await Post.findByIdAndUpdate(id, update, {
+      new: true,
+      runValidators: true,
+    });
     await onReviewUpdated(post.gameId, oldRating, newRating);
     res.status(200).json(updatedPost);
   } catch (error) {
+    if (error.name === "ValidationError") {
+      return res.status(400).json({ error: "Datos inválidos para actualizar el post." });
+    }
     res.status(500).json({ error: "Error al actualizar el post." });
   }
 };

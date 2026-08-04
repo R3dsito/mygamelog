@@ -146,6 +146,13 @@
         overflow-wrap: break-word;
     }
 
+    &__no-content {
+        font-size: 15px;
+        font-style: italic;
+        opacity: 0.4;
+        margin: 0;
+    }
+
     &__footer {
         display: flex;
         align-items: center;

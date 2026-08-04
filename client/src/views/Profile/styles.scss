@@ -127,31 +127,92 @@
     margin-bottom: 8px;
   }
 
+  // Misma presentación de pósters que PlaylistDetailModal, para que
+  // favoritos y playlists se lean como el mismo tipo de colección.
   &__favorites {
     width: 75%;
-    text-align: center;
     margin-top: 32px;
     border-top: 1px solid wheat;
 
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-
     @media (max-width: 900px) { width: 90%; }
-    @media (max-width: 600px) { width: 92%; grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 600px) { width: 92%; }
+
+    text-align: center;
 
     & h3 {
       margin: 16px 0;
     }
 
-    &__list {
+    // auto-fit colapsa los tracks sobrantes; con justify-content: center
+    // los pósters quedan centrados sin importar cuántos haya.
+    &__grid {
+      list-style: none;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(20%, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fit, 150px);
+      justify-content: center;
+      gap: 12px;
+      margin: 0;
+      padding: 2px;
+
+      @media (max-width: 900px) { grid-template-columns: repeat(auto-fit, 130px); }
+      @media (max-width: 600px) { grid-template-columns: repeat(auto-fit, 100px); }
     }
 
-    &__list .favorite {
-      padding: 8px;
+    &__poster {
+      display: block;
+      position: relative;
+      aspect-ratio: 2 / 3;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid rgba(245, 222, 179, 0.25);
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      &:hover {
+        border-color: wheat;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(43, 140, 105, 0.35);
+
+        .profile__favorites__poster-name {
+          opacity: 1;
+        }
+      }
+    }
+
+    &__poster-name {
+      position: absolute;
+      inset: auto 0 0 0;
+      padding: 18px 8px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: wheat;
+      background: linear-gradient(transparent, rgba(2, 22, 3, 0.9));
+      opacity: 0;
+      transition: opacity 0.15s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &__slot {
+      aspect-ratio: 2 / 3;
+      border: 1px dashed rgba(245, 222, 179, 0.2);
+      border-radius: 4px;
+    }
+
+    &__empty {
+      font-size: 13px;
+      opacity: 0.5;
+      text-align: center;
+      padding: 12px 0;
     }
   }
 

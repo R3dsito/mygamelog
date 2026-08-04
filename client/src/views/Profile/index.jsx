@@ -1,7 +1,7 @@
 import { useEffect, useContext, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 
-import { Favorite, Loader, Review, Modal } from "@/components";
+import { Loader, Review, Modal } from "@/components";
 import PlaylistCard from "@/components/PlaylistCard";
 import PlaylistDetailModal from "@/components/PlaylistDetailModal";
 import ProfileEditModal from "@/components/ProfileEditModal";
@@ -239,6 +239,8 @@ const handleProfileSaved = (newUsername) => {
       </div>
 
 <div className="profile__favorites">
+  <h3>Favoritos</h3>
+
   {favoritesState === "loading" && <Loader />}
 
   {favoritesError && (
@@ -247,31 +249,31 @@ const handleProfileSaved = (newUsername) => {
     </div>
   )}
 
-  {favoritesState === "success" && (
-    <>
-      {favoritesToRender.map((fav) => (
-        <Favorite
-          key={fav._id}
-          id={fav.gameId}
-          name={fav.gameName}
-          rating={fav.rating}
-          image={fav.imageUrl}
-        />
-      ))}
+  {favoritesState === "success" &&
+    (favoritesToRender.length === 0 ? (
+      <p className="profile__favorites__empty">No hay juegos favoritos aún.</p>
+    ) : (
+      <ul className="profile__favorites__grid">
+        {favoritesToRender.map((fav) => (
+          <li key={fav._id}>
+            <Link
+              to={`/game-details?id=${fav.gameId}`}
+              className="profile__favorites__poster"
+              title={fav.gameName}
+            >
+              <img src={fav.cover || fav.imageUrl} alt={fav.gameName} />
+              <span className="profile__favorites__poster-name">{fav.gameName}</span>
+            </Link>
+          </li>
+        ))}
 
-      {/* Slots vacíos */}
-      {Array.from({ length: emptySlots }).map((_, i) => (
-        <div key={`empty-${i}`} className="favorite favorite--empty">
-          <span>+</span>
-        </div>
-      ))}
-    </>
-  )}
-
+        {/* Slots vacíos para mantener la grilla pareja hasta el mínimo. */}
+        {Array.from({ length: emptySlots }).map((_, i) => (
+          <li key={`empty-${i}`} className="profile__favorites__slot" aria-hidden="true" />
+        ))}
+      </ul>
+    ))}
 </div>
-  {favoritesState === "success" && favoritesToRender.length === 0 && (
-    <p className="profile_nofavorites">No hay juegos favoritos aún.</p>
-  )}
 
       <div className="profile__playlists">
         <div className="profile__playlists__header">

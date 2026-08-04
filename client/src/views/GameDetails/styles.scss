@@ -22,13 +22,104 @@
         display: flex;
         align-items: center;
         gap: 6px;
-        color: #fff;
         font-size: 14px;
-        margin-bottom: 12px;
-        text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+        margin-bottom: 10px;
+        opacity: 0.85;
 
         i { color: #f5c518; font-size: 15px; }
         strong { font-size: 18px; font-weight: 700; }
+    }
+
+    // Letterboxd-style intro: portrait cover overlapping the backdrop,
+    // with title and actions in the column beside it.
+    &__hero {
+        display: flex;
+        align-items: flex-start;
+        gap: 28px;
+        margin-bottom: 36px;
+
+        @media (max-width: 600px) { gap: 16px; }
+    }
+
+    &__poster {
+        width: 220px;
+        flex-shrink: 0;
+        margin-top: -110px;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 3px solid rgba(245, 222, 179, 0.5);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+        aspect-ratio: 3 / 4;
+        background-color: rgba(245, 222, 179, 0.08);
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        &__empty {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            i {
+                font-size: 40px;
+                opacity: 0.25;
+            }
+        }
+
+        @media (max-width: 900px) { width: 165px; margin-top: -80px; }
+        @media (max-width: 600px) { width: 110px; margin-top: -48px; border-width: 2px; }
+    }
+
+    &__intro {
+        flex: 1;
+        min-width: 0;
+        padding-top: 4px;
+
+        & h1 {
+            font-size: 30px;
+            margin: 0 0 10px;
+            line-height: 1.2;
+
+            span {
+                font-weight: 400;
+                opacity: 0.5;
+            }
+
+            @media (max-width: 900px) { font-size: 24px; }
+            @media (max-width: 600px) { font-size: 18px; }
+        }
+    }
+
+    &__title-link {
+        color: inherit;
+        text-decoration: none;
+        border-bottom: 1px solid transparent;
+        transition: border-color 0.15s, opacity 0.15s;
+
+        &:hover {
+            border-bottom-color: rgba(245, 222, 179, 0.6);
+        }
+
+        i {
+            margin-left: 8px;
+            font-size: 0.5em;
+            vertical-align: middle;
+            opacity: 0.5;
+        }
+    }
+
+    &__publishers {
+        font-size: 13px;
+        opacity: 0.6;
+        margin: 0 0 20px;
+
+        @media (max-width: 600px) { margin-bottom: 14px; }
     }
 
     &__header {
@@ -38,23 +129,13 @@
         justify-content: center;
 
         &__images {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-            height: 250px;
-            background-position-y: 50%;
+            height: 320px;
+            background-position: center 35%;
             background-size: cover;
             border-bottom: 5px solid wheat;
 
-            & h1 {
-                font-size: 24px;
-                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8)
-            }
-
-            & div {
-                margin-bottom: 8px;
-            }
+            @media (max-width: 900px) { height: 260px; }
+            @media (max-width: 600px) { height: 180px; }
         }
     }
 
@@ -67,7 +148,7 @@
 
         &__actions {
             display: flex;
-            justify-content: center;
+            flex-wrap: wrap;
             gap: 12px;
         }
 
@@ -81,6 +162,8 @@
             padding: 4px 16px;
             border-radius: 25px;
             transition: .5s;
+
+            @media (max-width: 600px) { font-size: 14px; padding: 4px 12px; }
         }
 
         &__actions button:hover {
@@ -224,9 +307,52 @@
     }
 }
 
-.new-review-modal {
+.log-modal {
     display: flex;
     flex-direction: column;
+    gap: 22px;
+
+    &__section {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    &__label-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+    }
+
+    &__label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        opacity: 0.6;
+    }
+
+    &__score {
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    &__optional {
+        font-size: 11px;
+        opacity: 0.4;
+        font-style: italic;
+    }
+
+    &__stars {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    &__counter {
+        align-self: flex-end;
+        font-size: 11px;
+        opacity: 0.4;
+    }
 
     &__error {
         color: #e05c7a;
@@ -234,14 +360,85 @@
         background: rgba(224, 92, 122, 0.15);
         border-radius: 6px;
         padding: 8px 12px;
-        margin-bottom: 8px;
+        margin: 0;
     }
 
-    &__rating {
-        width: 100%;
+    &__submit {
+        background: wheat;
+        color: #021603;
+        border: none;
+        border-radius: 25px;
+        padding: 11px 0;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: opacity 0.15s;
+
+        &:hover:not(:disabled) { opacity: 0.85; }
+
+        &:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+    }
+
+    // Zona de borrado: separada del flujo principal y con confirmación en dos pasos.
+    &__danger {
         display: flex;
-        justify-content: space-between;
-        margin-bottom: 24px;
+        flex-direction: column;
+        gap: 10px;
+        padding-top: 16px;
+        border-top: 1px solid rgba(245, 222, 179, 0.15);
+    }
+
+    &__danger-text {
+        font-size: 13px;
+        opacity: 0.8;
+        text-align: center;
+    }
+
+    &__danger-actions {
+        display: flex;
+        gap: 10px;
+
+        button {
+            flex: 1;
+            border-radius: 20px;
+            padding: 8px 0;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            border: 1px solid rgba(245, 222, 179, 0.4);
+            color: wheat;
+
+            &:hover { background: rgba(245, 222, 179, 0.1); }
+        }
+    }
+
+    &__danger-confirm {
+        border-color: rgba(224, 92, 122, 0.6) !important;
+        color: #e05c7a !important;
+
+        &:hover { background: rgba(224, 92, 122, 0.15) !important; }
+
+        &:disabled { opacity: 0.5; cursor: not-allowed; }
+    }
+
+    &__danger-trigger {
+        align-self: center;
+        background: none;
+        border: none;
+        color: #e05c7a;
+        font-size: 13px;
+        opacity: 0.7;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: opacity 0.15s;
+
+        &:hover { opacity: 1; }
     }
 
     textarea {
@@ -265,23 +462,6 @@
         }
     }
 
-    // Botones de acción (Agregar a favoritos / Publicar) como pill wheat.
-    button {
-        margin-top: 24px;
-        background: transparent;
-        border: 2px solid wheat;
-        border-radius: 25px;
-        padding: 9px 0;
-        font-weight: 600;
-        color: wheat;
-        cursor: pointer;
-        transition: background 0.15s;
-
-        &:hover {
-            background: rgba(245, 222, 179, 0.15);
-        }
-    }
-
     // Estrellas de puntuación: sin caja, solo el ícono en wheat.
     .star-button {
         display: flex;
@@ -290,26 +470,45 @@
         width: 32px;
         height: 32px;
         padding: 0;
-        margin-top: 0;
         background: transparent;
         border: none;
-
-        &:hover {
-            background: transparent;
-        }
+        cursor: pointer;
 
         i {
             width: 15px;
             height: 15px;
             color: wheat;
+            transition: transform 0.1s;
         }
+
+        &:hover i { transform: scale(1.2); }
     }
 
+    // Único botón que conserva el pill outline; submit y borrado tienen
+    // sus propios estilos y no deben heredar de una regla genérica.
     .favorite-toggle {
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
+        background: transparent;
+        border: 2px solid wheat;
+        border-radius: 25px;
+        padding: 9px 0;
+        font-size: 14px;
+        font-weight: 600;
+        color: wheat;
+        cursor: pointer;
+        transition: background 0.15s;
+
+        &:hover:not(:disabled) {
+            background: rgba(245, 222, 179, 0.15);
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
 
         &.active {
             background: rgba(245, 222, 179, 0.15);

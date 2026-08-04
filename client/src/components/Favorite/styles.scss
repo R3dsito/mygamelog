@@ -15,8 +15,26 @@
         text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8)
     }
 
+    // El rating se revela al pasar el mouse para no competir con el título.
     & span {
         font-size: 14px;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8)
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        opacity: 0;
+        transform: translateY(4px);
+        transition: opacity 0.2s, transform 0.2s;
+    }
+
+    &:hover span,
+    &:focus-visible span {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    // Sin hover disponible (touch) el rating queda siempre visible.
+    @media (hover: none) {
+        & span {
+            opacity: 1;
+            transform: none;
+        }
     }
 }

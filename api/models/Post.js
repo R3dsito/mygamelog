@@ -18,13 +18,18 @@ const postSchema = new mongoose.Schema({
     ref: "Users",
     required: true,
   },
+  // Opcional: un post puede ser solo una puntuación, sin texto.
   content: {
     type: String,
-    required: true,
+    default: "",
+    trim: true,
+    maxlength: 5000,
   },
+  // La puntuación es lo mínimo que define un registro.
   rating: {
     type: Number,
-    min: 0,
+    required: true,
+    min: 1,
     max: 10,
   },
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Users" }],

@@ -31,6 +31,8 @@ const Review = ({ username, imagen, content, rating, onDelete, gameName, imageUr
   const [likesCount, setLikesCount] = useState(likes.length);
   const [expanded, setExpanded] = useState(false);
 
+  // Un post sin texto es un registro de puntuación, no una reseña.
+  const hasText = Boolean(content?.trim());
   const isTruncatable = content?.length > MAX_PREVIEW_CHARS;
   const displayContent = isTruncatable && !expanded
     ? content.slice(0, MAX_PREVIEW_CHARS).trimEnd() + "…"
@@ -69,7 +71,7 @@ const Review = ({ username, imagen, content, rating, onDelete, gameName, imageUr
               </h3>
             )}
             <div className="review__byline">
-              <span>Reseña de </span>
+              <span>{hasText ? "Reseña de " : "Puntuado por "}</span>
               <Link to={`/profile/username/${username}`} className="review__user">
                 {username}
               </Link>
@@ -78,7 +80,7 @@ const Review = ({ username, imagen, content, rating, onDelete, gameName, imageUr
           </div>
         </div>
 
-        <p className="review__text">{displayContent}</p>
+        {hasText && <p className="review__text">{displayContent}</p>}
         {isTruncatable && (
           <button
             type="button"
@@ -105,7 +107,7 @@ const Review = ({ username, imagen, content, rating, onDelete, gameName, imageUr
 
           {postId && (
             <Link to={`/review/${postId}`} className="review__detail-link">
-              Ver reseña
+              {hasText ? "Ver reseña" : "Ver detalle"}
             </Link>
           )}
 
