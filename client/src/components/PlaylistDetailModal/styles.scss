@@ -55,6 +55,21 @@
     margin: 6px 0 0;
   }
 
+  &__owner {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 12px;
+    color: wheat;
+    opacity: 0.6;
+    text-decoration: none;
+    transition: opacity 0.15s;
+
+    &:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+  }
+
   &__close {
     background: none;
     border: none;

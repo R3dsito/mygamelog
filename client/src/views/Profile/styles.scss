@@ -88,6 +88,24 @@
         background-color: rgba(245, 222, 179, .25);
     }
 
+  & button.profile__stat-btn {
+    background: none;
+    border: none;
+    margin-top: 0;
+    padding: 0;
+    border-radius: 0;
+    font-size: inherit;
+    font-weight: 600;
+    color: wheat;
+    cursor: pointer;
+    transition: opacity 0.15s;
+
+    &:hover {
+      background: none;
+      opacity: 0.7;
+    }
+  }
+
     & i {
       padding-right: 4px;
     }
@@ -115,13 +133,17 @@
     margin-top: 32px;
     border-top: 1px solid wheat;
 
-  display: grid;
-  grid-template-columns: repeat(4, 1fr); // siempre 4
-  gap: 16px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+
+    @media (max-width: 900px) { width: 90%; }
+    @media (max-width: 600px) { width: 92%; grid-template-columns: repeat(2, 1fr); }
+
     & h3 {
       margin: 16px 0;
     }
-    
+
     &__list {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(20%, 1fr));
@@ -146,6 +168,9 @@
     margin-top: 32px;
     border-top: 1px solid wheat;
     padding-top: 8px;
+
+    @media (max-width: 900px) { width: 90%; }
+    @media (max-width: 600px) { width: 92%; }
 
     &__header {
       display: flex;
@@ -223,6 +248,9 @@
     text-align: center;
     margin-top: 32px;
     border-top: 1px solid wheat;
+
+    @media (max-width: 900px) { width: 90%; }
+    @media (max-width: 600px) { width: 92%; }
 
     & h3 {
       margin: 16px 0;

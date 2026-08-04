@@ -42,10 +42,9 @@ const Navbar = () => {
 
   return (
     <nav className="navbar">
-      <NavLink to="/">
+      <NavLink to="/" aria-label="Inicio — myGameLog">
         <div>
-          <img src={LOGO} alt="Logo" />
-          <h1>myGameLog</h1>
+          <img src={LOGO} alt="myGameLog" />
         </div>
       </NavLink>
 
@@ -56,19 +55,21 @@ const Navbar = () => {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => query.trim().length > 0 && setShowResults(true)}
+          aria-label="Buscar usuarios"
         />
 
         {showResults && data.length > 0 && (
           <div className="navbar__search__results">
             {data.map((u) => (
-              <div
+              <button
                 key={u._id}
+                type="button"
                 className="navbar__search__result"
                 onClick={() => handleSelectUser(u.username)}
               >
                 <img src={u.imagen || DEFAULT_AVATAR} alt={u.username} />
                 <p>{u.username}</p>
-              </div>
+              </button>
             ))}
           </div>
         )}
@@ -77,13 +78,13 @@ const Navbar = () => {
       <ul>
         <li>
           <NavLink to="/">
-            <i className="fa-solid fa-gamepad"></i>Home
+            <i className="fa-solid fa-gamepad"></i><span>Home</span>
           </NavLink>
         </li>
 
         <li>
           <NavLink to="/feed">
-            <i className="fa-solid fa-newspaper"></i>Feed
+            <i className="fa-solid fa-newspaper"></i><span>Feed</span>
           </NavLink>
         </li>
 
@@ -91,7 +92,7 @@ const Navbar = () => {
           <li>
             <NavLink to={`/profile/username/${user.username}`}>
               <i className="fa-solid fa-user"></i>
-              {user.username}
+              <span>{user.username}</span>
             </NavLink>
           </li>
         )}
@@ -101,7 +102,7 @@ const Navbar = () => {
             <button onClick={logoutUser}>
               <NavLink to="/login">
                 <i className="fa-solid fa-right-from-bracket"></i>
-                Cerrar Sesión
+                <span>Cerrar Sesión</span>
               </NavLink>
             </button>
           </li>
@@ -109,7 +110,7 @@ const Navbar = () => {
           <li>
             <NavLink to="/login">
               <i className="fa-solid fa-right-to-bracket"></i>
-              Iniciar Sesión
+              <span>Iniciar Sesión</span>
             </NavLink>
           </li>
         )}

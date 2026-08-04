@@ -8,6 +8,8 @@ import {
   getLatestPosts,
   toggleLike,
   getScoreByGameId,
+  getUserReviewForGame,
+  getPostById,
 } from "../controllers/postController.js";
 import { verificarToken } from "../middlewares/auth.js";
 
@@ -18,7 +20,9 @@ postRoutes.post("/", verificarToken, createPost);
 
 // Rutas estáticas primero (antes de /:gameId para evitar conflictos)
 postRoutes.get("/latest", getLatestPosts);
+postRoutes.get("/detail/:postId", getPostById);
 postRoutes.get("/user/:userId", showPostsById);
+postRoutes.get("/user/:userId/game/:gameId", getUserReviewForGame);
 postRoutes.get("/score/:gameId", getScoreByGameId);
 postRoutes.post("/:id/like", verificarToken, toggleLike);
 

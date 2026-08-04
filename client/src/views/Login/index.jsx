@@ -5,6 +5,7 @@ import useLogin from "@/hooks/useLogin";
 
 const Login = () => {
   const navigate = useNavigate();
+  const [localError, setLocalError] = useState("");
 
   const [userData, setUserData] = useState({
     email: "",
@@ -18,6 +19,9 @@ const Login = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
+    setLocalError("");
+    if (!userData.email.trim()) return setLocalError("Ingresá tu email.");
+    if (!userData.password) return setLocalError("Ingresá tu contraseña.");
     login();
   };
 
@@ -27,36 +31,48 @@ const Login = () => {
     }
   }, [state]);
 
+  const displayError = localError || (error ? (error.response?.data?.error ?? "Error al iniciar sesión. Intentá de nuevo.") : null);
+
   return (
     <div className="login">
       <div className="card">
-        <h2>Iniciar Sesión</h2>
+        <h1>Iniciar Sesión</h1>
 
-        <form>
-          <input
-            placeholder="Email"
-            type="email"
-            value={userData.email}
-            onChange={(e) =>
-              setUserData({ ...userData, email: e.target.value })
-            }
-          />
+        <form onSubmit={handleLogin}>
+          <div className="card__field">
+            <label htmlFor="login-email">Email</label>
+            <input
+              id="login-email"
+              placeholder="tu@email.com"
+              type="email"
+              value={userData.email}
+              onChange={(e) =>
+                setUserData({ ...userData, email: e.target.value })
+              }
+              aria-label="Email"
+            />
+          </div>
 
-          <input
-            placeholder="Contraseña"
-            type="password"
-            value={userData.password}
-            onChange={(e) =>
-              setUserData({ ...userData, password: e.target.value })
-            }
-          />
+          <div className="card__field">
+            <label htmlFor="login-password">Contraseña</label>
+            <input
+              id="login-password"
+              placeholder="••••••••"
+              type="password"
+              value={userData.password}
+              onChange={(e) =>
+                setUserData({ ...userData, password: e.target.value })
+              }
+              aria-label="Contraseña"
+            />
+          </div>
 
-          <button onClick={handleLogin}>Ingresar</button>
+          <button type="submit">Ingresar</button>
 
-          {error && (
+          {displayError && (
             <p className="error-message">
               <i className="fa-solid fa-circle-exclamation"></i>
-              {error.response.data.error}
+              {displayError}
             </p>
           )}
         </form>

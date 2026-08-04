@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 
 import { Loader, Modal, Review } from "@/components";
 import AddToPlaylistModal from "@/components/AddToPlaylistModal";
+import api from "@/api/axiosInstance";
 
 import useGetGame from "@/hooks/useGetGame";
 import useGetReviews from "@/hooks/useGetReviews";
@@ -13,6 +14,20 @@ import useToggleFavorite from "@/hooks/useToggleFavorite";
 import useGetGameScore from "@/hooks/useGetGameScore";
 
 import { AuthContext } from "@/contexts/AuthContext";
+
+const DRAFT_KEY = (gameId) => `review_draft_${gameId}`;
+
+const saveDraft = (gameId, score, review) => {
+  if (!gameId) return;
+  localStorage.setItem(DRAFT_KEY(gameId), JSON.stringify({ score, review }));
+};
+
+const clearDraft = (gameId) => localStorage.removeItem(DRAFT_KEY(gameId));
+
+const loadDraft = (gameId) => {
+  try { return JSON.parse(localStorage.getItem(DRAFT_KEY(gameId))); }
+  catch { return null; }
+};
 
 const GameDetails = () => {
   const [searchParams] = useSearchParams();
@@ -30,6 +45,7 @@ const [reviewData, setReviewData] = useState({
   addToFavorites: false,
 });
 const [reviewError, setReviewError] = useState("");
+const [editingPostId, setEditingPostId] = useState(null);
 
   const {
     state: gameState,
@@ -78,11 +94,19 @@ const handleToggleFavorite = async () => {
 };
 
   const handleScoreChange = (score) => {
-    setReviewData({ ...reviewData, score });
+    setReviewData((prev) => {
+      const next = { ...prev, score };
+      if (!editingPostId) saveDraft(id, score, prev.review);
+      return next;
+    });
   };
 
   const handleReviewChange = (e) => {
-    setReviewData({ ...reviewData, review: e.target.value });
+    const review = e.target.value;
+    setReviewData((prev) => {
+      if (!editingPostId) saveDraft(id, prev.score, review);
+      return { ...prev, review };
+    });
   };
 
   useEffect(() => {
@@ -90,6 +114,16 @@ const handleToggleFavorite = async () => {
       getGame();
       getReviews();
       fetchScore(id);
+      if (user) {
+        api.get(`/posts/user/${user.id}/game/${id}`).then((res) => {
+          const existing = res.data;
+          setEditingPostId(existing._id);
+          setReviewData({ score: existing.rating, review: existing.content, addToFavorites: false });
+        }).catch(() => {
+          const draft = loadDraft(id);
+          if (draft) setReviewData((prev) => ({ ...prev, ...draft }));
+        });
+      }
     }
   }, []);
 
@@ -99,6 +133,12 @@ const handleToggleFavorite = async () => {
       fetchScore(id);
     }
   }, [postReviewState]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setReviewError("");
+    }
+  }, [isOpen]);
 
   return (
     <div className="game-details">
@@ -114,15 +154,15 @@ const handleToggleFavorite = async () => {
             `,
               }}
             >
-              <h3>
+              <h1>
                 {gameData.name}
                 <span> ({dayjs(gameData.released).format("YYYY")})</span>
-              </h3>
+              </h1>
               <div className="game-details__score">
                 <i className="fa-solid fa-star" />
                 {gameScore.totalReviews > 0
-                  ? <><strong>{gameScore.averageScore.toFixed(1)}</strong><span>/10 · {gameScore.totalReviews} {gameScore.totalReviews === 1 ? "reseña" : "reseñas"}</span></>
-                  : <span>Sin reseñas aún</span>
+                  ? <><strong>{gameScore.averageScore.toFixed(1)}</strong><span>/10 · {gameScore.totalReviews} {gameScore.totalReviews === 1 ? "reseña" : "reseñas"} en mygamelog</span></>
+                  : <span>Sin reseñas en mygamelog aún</span>
                 }
               </div>
               <div>
@@ -138,7 +178,9 @@ const handleToggleFavorite = async () => {
 
           <div className="game-details__content">
             <div className="game-details__content__actions">
-              <button onClick={() => setIsOpen(true)}>Nueva reseña</button>
+              <button onClick={() => setIsOpen(true)}>
+                {editingPostId ? "Editar reseña" : "Nueva reseña"}
+              </button>
               {user && (
                 <button onClick={() => setShowPlaylistModal(true)}>
                   <i className="fa-solid fa-bookmark" /> Playlist
@@ -169,7 +211,10 @@ const handleToggleFavorite = async () => {
 
                 <h4>Sitio web:</h4>
                 <div className="game-details__content__website">
-                  <a href={gameData.website}>{gameData.website}</a>
+                  <a href={gameData.website} target="_blank" rel="noopener noreferrer">
+                    {gameData.website}
+                    <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" />
+                  </a>
                 </div>
               </aside>
             </div>
@@ -231,7 +276,7 @@ const handleToggleFavorite = async () => {
 
       <Modal
         closable
-        title="Nueva reseña"
+        title={editingPostId ? "Editar reseña" : "Nueva reseña"}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
         className="modal--dark"
@@ -244,10 +289,12 @@ const handleToggleFavorite = async () => {
               return (
                 <button
                   key={index}
+                  type="button"
                   onClick={() => handleScoreChange(starIndex)}
                   className={`star-button ${
                     starIndex <= reviewData.score ? "active" : ""
                   }`}
+                  aria-label={`Calificar ${starIndex} de 10`}
                 >
                   <i
                     className={`fa-${
@@ -261,7 +308,9 @@ const handleToggleFavorite = async () => {
 
           <textarea
             placeholder="Escribe una reseña"
+            value={reviewData.review}
             onChange={handleReviewChange}
+            aria-label="Escribe una reseña"
           ></textarea>
 
           <button
@@ -292,8 +341,20 @@ const handleToggleFavorite = async () => {
       return setReviewError("Escribí algo en la reseña antes de publicar.");
     }
     try {
+      if (editingPostId) {
+        await api.put(`/posts/${editingPostId}`, {
+          content: reviewData.review,
+          rating: reviewData.score,
+        });
+        getReviews();
+        fetchScore(id);
+        setIsOpen(false);
+        return;
+      }
+
       const newPost = await postReview();
       getReviews();
+      clearDraft(id);
 
       if (reviewData.addToFavorites && newPost?._id) {
         const res = await toggleFavorite({ userId: user.id, postId: newPost._id });
@@ -305,14 +366,26 @@ const handleToggleFavorite = async () => {
     } catch (err) {
       const status = err?.response?.status;
       if (status === 409) {
-        setReviewError("Ya publicaste una reseña para este juego.");
+        try {
+          const res = await api.get(`/posts/user/${user.id}/game/${gameData.id}`);
+          const existing = res.data;
+          setEditingPostId(existing._id);
+          setReviewData({ score: existing.rating, review: existing.content, addToFavorites: false });
+          setReviewError("Ya tenés una reseña para este juego. Podés editarla a continuación.");
+        } catch {
+          setReviewError("Ya publicaste una reseña para este juego.");
+        }
+      } else if (status === 401) {
+        setReviewError("Tu sesión expiró. Iniciá sesión nuevamente.");
+      } else if (!err?.response) {
+        setReviewError("Sin conexión al servidor. Verificá tu internet e intentá de nuevo.");
       } else {
-        setReviewError("Error al publicar la reseña. Intentá de nuevo.");
+        setReviewError("No se pudo publicar la reseña. Intentá de nuevo.");
       }
     }
   }}
 >
-  ¡Publicar!
+  {editingPostId ? "Guardar cambios" : "¡Publicar!"}
 </button>
         </div>
       </Modal>

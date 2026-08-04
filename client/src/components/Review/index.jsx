@@ -1,6 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
+import { useState, useContext } from "react";
+import { Link } from "react-router-dom";
 import { AuthContext } from "@/contexts/AuthContext";
 import useToggleLike from "@/hooks/useToggleLike";
 
@@ -15,11 +14,13 @@ const RatingStars = ({ rating }) => {
         let icon = "fa-regular fa-star";
         if (pos <= full) icon = "fa-solid fa-star";
         else if (pos === full + 1 && hasHalf) icon = "fa-solid fa-star-half-stroke";
-        return <i key={i} className={icon}></i>;
+        return <i key={i} className={icon} aria-hidden="true"></i>;
       })}
     </span>
   );
 };
+
+const MAX_PREVIEW_CHARS = 280;
 
 const Review = ({ username, imagen, content, rating, onDelete, gameName, imageUrl, gameId, postId, likes = [] }) => {
   const { user: loggedInUser } = useContext(AuthContext);
@@ -28,11 +29,12 @@ const Review = ({ username, imagen, content, rating, onDelete, gameName, imageUr
   const initialLiked = loggedInUser ? likes.some((id) => id.toString() === loggedInUser.id) : false;
   const [isLiked, setIsLiked] = useState(initialLiked);
   const [likesCount, setLikesCount] = useState(likes.length);
+  const [expanded, setExpanded] = useState(false);
 
-  const navigate = useNavigate();
-
-  const handleOnClick = () => navigate(`/game-details?id=${gameId}`);
-  const handleOnClickUser = () => navigate(`/profile/username/${username}`);
+  const isTruncatable = content?.length > MAX_PREVIEW_CHARS;
+  const displayContent = isTruncatable && !expanded
+    ? content.slice(0, MAX_PREVIEW_CHARS).trimEnd() + "…"
+    : content;
 
   const handleLike = async () => {
     if (!loggedInUser || !postId || likeLoading) return;
@@ -43,37 +45,49 @@ const Review = ({ username, imagen, content, rating, onDelete, gameName, imageUr
 
   return (
     <div className="review">
-      {imageUrl && (
+      {imageUrl && gameId && (
         <div className="review__image-container">
-          <div className="review__image" onClick={handleOnClick}>
+          <Link to={`/game-details?id=${gameId}`} className="review__image">
             <img src={imageUrl} alt={gameName} />
-          </div>
+          </Link>
         </div>
       )}
 
       <div className="review__content">
         <div className="review__header">
-          <div className="review__avatar" onClick={handleOnClickUser}>
-            {imagen ? <img src={imagen} alt={username} /> : <i className="fa-solid fa-user"></i>}
-          </div>
+          <Link to={`/profile/username/${username}`} className="review__avatar">
+            {imagen
+              ? <img src={imagen} alt={username} />
+              : <i className="fa-solid fa-user" aria-hidden="true"></i>
+            }
+          </Link>
 
           <div className="review__meta">
-            {gameName && (
-              <h4 className="review__game" onClick={handleOnClick}>
-                {gameName}
-              </h4>
+            {gameName && gameId && (
+              <h3 className="review__game">
+                <Link to={`/game-details?id=${gameId}`}>{gameName}</Link>
+              </h3>
             )}
             <div className="review__byline">
               <span>Reseña de </span>
-              <span className="review__user" onClick={handleOnClickUser}>
+              <Link to={`/profile/username/${username}`} className="review__user">
                 {username}
-              </span>
+              </Link>
               {rating != null && <RatingStars rating={rating} />}
             </div>
           </div>
         </div>
 
-        <p className="review__text">{content}</p>
+        <p className="review__text">{displayContent}</p>
+        {isTruncatable && (
+          <button
+            type="button"
+            className="review__expand"
+            onClick={() => setExpanded((e) => !e)}
+          >
+            {expanded ? "Leer menos" : "Leer más"}
+          </button>
+        )}
 
         <div className="review__footer">
           {postId && (
@@ -81,16 +95,23 @@ const Review = ({ username, imagen, content, rating, onDelete, gameName, imageUr
               className={`review__like ${isLiked ? "review__like--active" : ""}`}
               onClick={handleLike}
               disabled={!loggedInUser || likeLoading}
+              aria-label={isLiked ? "Quitar me gusta" : "Me gusta"}
             >
-              <i className={`fa-${isLiked ? "solid" : "regular"} fa-heart`}></i>
+              <i className={`fa-${isLiked ? "solid" : "regular"} fa-heart`} aria-hidden="true"></i>
               <span>Me gusta</span>
               {likesCount > 0 && <span className="review__like-count">{likesCount}</span>}
             </button>
           )}
 
+          {postId && (
+            <Link to={`/review/${postId}`} className="review__detail-link">
+              Ver reseña
+            </Link>
+          )}
+
           {loggedInUser?.username === username && (
-            <button className="review__delete" onClick={onDelete}>
-              <i className="fa-solid fa-trash"></i>Eliminar
+            <button className="review__delete" onClick={onDelete} aria-label="Eliminar reseña">
+              <i className="fa-solid fa-trash" aria-hidden="true"></i>Eliminar
             </button>
           )}
         </div>

@@ -80,7 +80,7 @@ const Home = () => {
     <div className="home">
       <div className="home__banner">
       </div>
-      <h2>¡Encontrá tu juego!</h2>
+      <h1>¡Encontrá tu juego!</h1>
 
       <div className="home__searcher">
         <input
@@ -88,6 +88,7 @@ const Home = () => {
           placeholder="Buscar juegos..."
           value={searchValue}
           onChange={handleOnChange}
+          aria-label="Buscar juegos"
         />
 
         {showSuggestions && (
@@ -104,23 +105,24 @@ const Home = () => {
                   <i className="fa-solid fa-bug fa-xl"></i>
                 </span>
                 <p>Ups! Ha ocurrido un error!</p>
-                <p>{error.response.data.error}.</p>
+                <p>{error?.response?.data?.error ?? "No se pudo conectar con el servidor."}</p>
               </div>
             )}
 
             {state === "success" &&
               data.map((result) => (
-                <div
+                <button
                   key={result.id}
+                  type="button"
                   className="home__results__result"
                   onClick={() => handleSelectResult(result.id)}
                 >
                   <div>
-                    <img src={result.background_image} />
+                    <img src={result.background_image} alt={result.name} />
                   </div>
 
                   <p>{result.name}</p>
-                </div>
+                </button>
               ))}
           </div>
         )}
@@ -133,6 +135,12 @@ const Home = () => {
           <div className="home__suggestions__loading">
             <Loader />
           </div>
+        )}
+
+        {suggestionsState === "error" && (
+          <p className="home__suggestions__error">
+            No se pudieron cargar las sugerencias en este momento.
+          </p>
         )}
 
         <div className="home__suggestions__list">

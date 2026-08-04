@@ -15,6 +15,15 @@ const PlaylistDetailModal = ({ playlist, onClose }) => {
             {playlist.description && (
               <p className="pdm-modal__desc">{playlist.description}</p>
             )}
+            {playlist.userId?.username && (
+              <Link
+                to={`/profile/username/${playlist.userId.username}`}
+                className="pdm-modal__owner"
+                onClick={onClose}
+              >
+                por @{playlist.userId.username}
+              </Link>
+            )}
           </div>
           <button className="pdm-modal__close" onClick={onClose}>
             <i className="fa-solid fa-xmark" />

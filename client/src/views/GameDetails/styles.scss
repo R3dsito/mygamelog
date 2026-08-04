@@ -47,7 +47,7 @@
             background-size: cover;
             border-bottom: 5px solid wheat;
 
-            & h3 {
+            & h1 {
                 font-size: 24px;
                 text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8)
             }
@@ -62,9 +62,13 @@
         width: 75%;
         padding: 32px 24px;
 
+        @media (max-width: 900px) { width: 92%; padding: 24px 16px; }
+        @media (max-width: 600px) { width: 100%; padding: 20px 16px; }
+
         &__actions {
             display: flex;
             justify-content: center;
+            gap: 12px;
         }
 
         &__actions button {
@@ -190,6 +194,12 @@
 
             &:hover {
                 opacity: 0.7;
+            }
+
+            i {
+                margin-left: 5px;
+                font-size: 11px;
+                vertical-align: middle;
             }
         }
 

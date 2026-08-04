@@ -200,7 +200,7 @@ const handleProfileSaved = (newUsername) => {
         </div>
 
 <div className="profile__header__data">
-  <h2>{userData?.username ?? "-"}</h2>
+  <h1>{userData?.username ?? "-"}</h1>
   {userData?.bio && <p className="profile__bio">{userData.bio}</p>}
 
 {isMyProfile && (
@@ -212,19 +212,19 @@ const handleProfileSaved = (newUsername) => {
   <div>
     <div>
       <span>{userData?.favorites?.length ?? "0"}</span>
-      <p>Juegos</p>
+      <p>Favoritos</p>
     </div>
 
     <div className="profile__followers">
-      <span onClick={() => setShowFollowersModal(true)}>
+      <button type="button" className="profile__stat-btn" onClick={() => setShowFollowersModal(true)}>
         {userData?.followersCount ?? "0"}
-      </span>
+      </button>
       <p>Seguidores</p>
     </div>
 
 
     <div className="profile__following">
-      <span onClick={() => setShowFollowingModal(true)}>{userData?.followingCount ?? "0"}</span>
+      <button type="button" className="profile__stat-btn" onClick={() => setShowFollowingModal(true)}>{userData?.followingCount ?? "0"}</button>
       <p>Seguidos</p>
     </div>
   </div>
@@ -360,14 +360,18 @@ const handleProfileSaved = (newUsername) => {
     {userData?.followers?.length > 0 ? (
       <ul>
         {userData.followers.map((user) => (
-          <Link to={`/profile/username/${user.username}`} onClick={() => setIsOpen(false)}>
-          <li className="modal__followers" key={user._id}><div>
-            <img className="userImage"
-  src={user.imagen || DEFAULT_AVATAR}
-  alt="Profile"
-/>
-          </div>{user.username}</li>
-          </Link>
+          <li key={user._id}>
+            <Link
+              to={`/profile/username/${user.username}`}
+              className="modal__followers"
+              onClick={() => setShowFollowersModal(false)}
+            >
+              <div>
+                <img className="userImage" src={user.imagen || DEFAULT_AVATAR} alt={user.username} />
+              </div>
+              {user.username}
+            </Link>
+          </li>
         ))}
       </ul>
     ) : (
@@ -385,14 +389,18 @@ const handleProfileSaved = (newUsername) => {
     {userData?.following?.length > 0 ? (
       <ul>
         {userData.following.map((user) => (
-          <Link to={`/profile/username/${user.username}`} onClick={() => setIsOpen(false)}>
-  <li className="modal__followers" key={user._id}><div>
-            <img className="userImage"
-  src={user.imagen || DEFAULT_AVATAR}
-  alt="Profile"
-/>
-          </div>{user.username}</li>
-</Link>
+          <li key={user._id}>
+            <Link
+              to={`/profile/username/${user.username}`}
+              className="modal__followers"
+              onClick={() => setShowFollowingModal(false)}
+            >
+              <div>
+                <img className="userImage" src={user.imagen || DEFAULT_AVATAR} alt={user.username} />
+              </div>
+              {user.username}
+            </Link>
+          </li>
         ))}
       </ul>
     ) : (

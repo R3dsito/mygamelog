@@ -8,6 +8,7 @@ import {
   Profile,
   Protected,
   Register,
+  ReviewDetail,
 } from "@/views";
 
 import { Navbar } from "@/components";
@@ -26,6 +27,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/game-details" element={<GameDetails />} />
+          <Route path="/review/:postId" element={<ReviewDetail />} />
 
           <Route element={<Protected />}>
           <Route path="/profile/:id" element={<Profile />} />

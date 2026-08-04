@@ -101,13 +101,67 @@ export const toggleLike = async (req, res) => {
 
 export const getLatestPosts = async (req, res) => {
   try {
-    const posts = await Post.find()
-      .sort({ createdAt: -1 })
-      .limit(10)
-      .populate("userId", "username imagen");
-    res.status(200).json(posts);
+    const skip = Math.max(0, parseInt(req.query.skip) || 0);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 10));
+    const { sortBy, ratingMin, ratingMax, dateFrom } = req.query;
+
+    const match = {};
+    if (ratingMin !== undefined || ratingMax !== undefined) {
+      match.rating = {};
+      if (ratingMin !== undefined) match.rating.$gte = parseInt(ratingMin);
+      if (ratingMax !== undefined) match.rating.$lte = parseInt(ratingMax);
+    }
+    if (dateFrom) {
+      match.createdAt = { $gte: new Date(dateFrom) };
+    }
+
+    let posts, total;
+
+    if (sortBy === "likes") {
+      [posts, total] = await Promise.all([
+        Post.aggregate([
+          { $match: match },
+          { $addFields: { likesCount: { $size: "$likes" } } },
+          { $sort: { likesCount: -1, createdAt: -1 } },
+          { $skip: skip },
+          { $limit: limit },
+          { $lookup: { from: "users", localField: "userId", foreignField: "_id", as: "userId" } },
+          { $unwind: "$userId" },
+          { $project: { gameId: 1, gameName: 1, imageUrl: 1, content: 1, rating: 1, likes: 1, createdAt: 1, userId: { _id: 1, username: 1, imagen: 1 } } },
+        ]),
+        Post.countDocuments(match),
+      ]);
+    } else {
+      [posts, total] = await Promise.all([
+        Post.find(match).sort({ createdAt: -1 }).skip(skip).limit(limit).populate("userId", "username imagen"),
+        Post.countDocuments(match),
+      ]);
+    }
+
+    res.status(200).json({ posts, hasMore: skip + limit < total, total });
   } catch (error) {
     res.status(500).json({ error: "Error al obtener los últimos posts." });
+  }
+};
+
+export const getPostById = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.postId).populate("userId", "username imagen");
+    if (!post) return res.status(404).json({ error: "Reseña no encontrada." });
+    res.status(200).json(post);
+  } catch (error) {
+    res.status(500).json({ error: "Error al obtener la reseña." });
+  }
+};
+
+export const getUserReviewForGame = async (req, res) => {
+  try {
+    const { userId, gameId } = req.params;
+    const post = await Post.findOne({ userId, gameId });
+    if (!post) return res.status(404).json({ error: "Reseña no encontrada." });
+    res.status(200).json(post);
+  } catch (error) {
+    res.status(500).json({ error: "Error al obtener la reseña." });
   }
 };
 

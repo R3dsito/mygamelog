@@ -1,0 +1,216 @@
+.review-detail {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &--error {
+        justify-content: center;
+        gap: 16px;
+        text-align: center;
+        opacity: 0.65;
+        padding: 64px 16px;
+
+        a {
+            color: wheat;
+            font-size: 14px;
+        }
+    }
+
+    &__hero {
+        width: 100%;
+        height: 320px;
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        align-items: flex-end;
+        flex-shrink: 0;
+    }
+
+    &__hero-inner {
+        width: 100%;
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 28px 40px;
+    }
+
+    &__game-title {
+        font-size: 2rem;
+        margin: 0;
+        line-height: 1.2;
+
+        a {
+            color: wheat;
+            text-decoration: none;
+
+            &:hover {
+                opacity: 0.8;
+            }
+        }
+    }
+
+    &__body {
+        width: 100%;
+        max-width: 760px;
+        padding: 32px 40px 80px;
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+        box-sizing: border-box;
+    }
+
+    &__back {
+        color: wheat;
+        text-decoration: none;
+        font-size: 13px;
+        opacity: 0.5;
+        align-self: flex-start;
+        transition: opacity 0.15s;
+
+        &:hover {
+            opacity: 1;
+        }
+    }
+
+    &__user {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    &__avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(245, 222, 179, 0.15);
+        border: 1px solid rgba(245, 222, 179, 0.3);
+        color: inherit;
+        text-decoration: none;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        i {
+            color: rgba(245, 222, 179, 0.5);
+        }
+    }
+
+    &__username {
+        color: wheat;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 15px;
+        display: block;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    &__date {
+        font-size: 12px;
+        opacity: 0.4;
+        margin: 4px 0 0;
+    }
+
+    &__rating {
+        display: flex;
+        align-items: baseline;
+        gap: 4px;
+    }
+
+    &__rating-score {
+        font-size: 3.5rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    &__rating-max {
+        font-size: 1.4rem;
+        opacity: 0.4;
+    }
+
+    &__content {
+        font-size: 16px;
+        line-height: 1.75;
+        margin: 0;
+        white-space: pre-wrap;
+        overflow-wrap: break-word;
+    }
+
+    &__footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 20px;
+        border-top: 1px solid rgba(245, 222, 179, 0.12);
+    }
+
+    &__like {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: none;
+        border: none;
+        color: wheat;
+        font-size: 14px;
+        cursor: pointer;
+        padding: 0;
+        opacity: 0.5;
+        transition: opacity 0.15s;
+
+        &:hover:not(:disabled) {
+            opacity: 1;
+        }
+
+        &--active {
+            opacity: 1;
+
+            i,
+            span {
+                color: #e05c7a;
+            }
+        }
+
+        &:disabled {
+            cursor: default;
+        }
+    }
+
+    &__game-link {
+        color: wheat;
+        text-decoration: none;
+        font-size: 13px;
+        opacity: 0.55;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: opacity 0.15s;
+
+        &:hover { opacity: 1; }
+
+        i { font-size: 11px; }
+    }
+
+    @media (max-width: 600px) {
+        &__hero { height: 220px; }
+
+        &__hero-inner { padding: 20px 16px; }
+
+        &__game-title { font-size: 1.4rem; }
+
+        &__body { padding: 24px 16px 48px; }
+
+        &__rating-score { font-size: 2.5rem; }
+
+        &__content { font-size: 15px; }
+    }
+}
