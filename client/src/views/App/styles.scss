@@ -1,9 +1,35 @@
+// Medalla en pixel art, coherente con Tiny5 (la tipografía de marca).
+// Cada rect es un píxel de una grilla de 24x28; con coordenadas enteras y
+// un tile múltiplo exacto de la grilla, los bordes caen en píxeles enteros
+// y no se ven borrosos. El SVG original pesa 40 KB y es a color: no sirve
+// para tilear. La opacidad va en el fill, porque `opacity` atenuaría todo
+// el elemento y no solo su background-image.
+//
+//        ██    ██        cintas
+//         ██  ██
+//          ████
+//        ███████         aro de la medalla
+//       ██     ██
+//       ██ ██  ██        centro
+//       ██     ██
+//        ███████
+$medal-glyph: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 28' shape-rendering='crispEdges'%3E%3Cg fill='%23f5deb3' fill-opacity='0.05'%3E%3Crect x='8' y='7' width='2' height='2'/%3E%3Crect x='9' y='9' width='2' height='2'/%3E%3Crect x='10' y='11' width='2' height='1'/%3E%3Crect x='14' y='7' width='2' height='2'/%3E%3Crect x='13' y='9' width='2' height='2'/%3E%3Crect x='12' y='11' width='2' height='1'/%3E%3Crect x='10' y='12' width='4' height='1'/%3E%3Crect x='8' y='13' width='2' height='1'/%3E%3Crect x='14' y='13' width='2' height='1'/%3E%3Crect x='7' y='14' width='2' height='4'/%3E%3Crect x='15' y='14' width='2' height='4'/%3E%3Crect x='8' y='18' width='2' height='1'/%3E%3Crect x='14' y='18' width='2' height='1'/%3E%3Crect x='10' y='19' width='4' height='1'/%3E%3Crect x='11' y='15' width='2' height='2'/%3E%3C/g%3E%3C/svg%3E";
+
 .app {
     display: flex;
     flex-direction: column;
     min-height: 100dvh;
 
     background-color: #021603f6;
+
+    // Dos capas del mismo glifo, la segunda desplazada media celda: da el
+    // intercalado en tresbolillo en vez de una grilla alineada.
+    // 96x112 es la grilla de 24x28 por 4: cada píxel del dibujo mide
+    // exactamente 4px en pantalla, sin fracciones que lo desdibujen.
+    background-image: url($medal-glyph), url($medal-glyph);
+    background-size: 96px 112px, 96px 112px;
+    background-position: 0 0, 48px 56px;
+    background-repeat: repeat, repeat;
 
     // El <main> es un envoltorio de layout: mantiene la cadena flex para que
     // las vistas sigan pudiendo usar flex: 1 contra la altura de .app.
