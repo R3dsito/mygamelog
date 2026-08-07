@@ -133,11 +133,10 @@
     width: 75%;
     margin-top: 32px;
     border-top: 1px solid wheat;
+    text-align: center;
 
     @media (max-width: 900px) { width: 90%; }
     @media (max-width: 600px) { width: 92%; }
-
-    text-align: center;
 
     & h3 {
       margin: 16px 0;
@@ -268,7 +267,6 @@
         border-radius: 6px;
         font-size: 13px;
         color: #021603;
-        outline: none;
         &:focus { border-color: #1da1f2; }
       }
 
@@ -423,7 +421,6 @@
       transition: border-color 0.2s;
 
       &:focus {
-        outline: none;
         border-color: #1da1f2;
       }
 

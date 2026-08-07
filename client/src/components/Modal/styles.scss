@@ -54,6 +54,10 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
+        background: none;
+        border: none;
+        padding: 4px 8px;
+        font-size: inherit;
     }
 
     &__close-button i {
@@ -109,10 +113,6 @@
 
     & input::placeholder {
         color: wheat;
-    }
-
-    & input:focus {
-        outline: none;
     }
 
 }

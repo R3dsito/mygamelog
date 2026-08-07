@@ -4,4 +4,19 @@
     min-height: 100dvh;
 
     background-color: #021603f6;
+
+    // El <main> es un envoltorio de layout: mantiene la cadena flex para que
+    // las vistas sigan pudiendo usar flex: 1 contra la altura de .app.
+    > main {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-width: 0;
+
+        // Recibe foco solo desde el skip link, de forma programática:
+        // un recuadro alrededor de toda la página no aporta información.
+        &:focus {
+            outline: none;
+        }
+    }
 }

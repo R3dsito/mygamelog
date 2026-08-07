@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { Loader } from "@/components";
 import FeedCard from "@/components/FeedCard";
 import useGetFeed from "@/hooks/useGetFeed";
+import useRadioGroup from "@/hooks/useRadioGroup";
 import "./styles.scss";
 
 const RATING_OPTIONS = [
@@ -42,6 +43,30 @@ const Feed = () => {
   const applyFilter = (r, p, s) => getFeed(buildParams(r, p, s));
   const isRatingActive = (opt) => JSON.stringify(rating) === JSON.stringify(opt.value);
 
+  const ratingLabelId = useId();
+  const periodLabelId = useId();
+  const sortLabelId   = useId();
+
+  const selectRating = (i) => { setRating(RATING_OPTIONS[i].value); applyFilter(RATING_OPTIONS[i].value, period, sortBy); };
+  const selectPeriod = (i) => { setPeriod(PERIOD_OPTIONS[i].value); applyFilter(rating, PERIOD_OPTIONS[i].value, sortBy); };
+  const selectSort   = (i) => { setSortBy(SORT_OPTIONS[i].value);   applyFilter(rating, period, SORT_OPTIONS[i].value); };
+
+  const { getRadioProps: getRatingProps } = useRadioGroup({
+    count: RATING_OPTIONS.length,
+    selectedIndex: RATING_OPTIONS.findIndex(isRatingActive),
+    onSelect: selectRating,
+  });
+  const { getRadioProps: getPeriodProps } = useRadioGroup({
+    count: PERIOD_OPTIONS.length,
+    selectedIndex: PERIOD_OPTIONS.findIndex((o) => o.value === period),
+    onSelect: selectPeriod,
+  });
+  const { getRadioProps: getSortProps } = useRadioGroup({
+    count: SORT_OPTIONS.length,
+    selectedIndex: SORT_OPTIONS.findIndex((o) => o.value === sortBy),
+    onSelect: selectSort,
+  });
+
   useEffect(() => { getFeed(); }, []);
 
   return (
@@ -59,14 +84,15 @@ const Feed = () => {
 
         <div className={`feed__sidebar-body${filtersOpen ? " feed__sidebar-body--open" : ""}`}>
         <div className="feed__filter-group">
-          <span className="feed__filter-label">Rating</span>
-          <div className="feed__filter-options">
-            {RATING_OPTIONS.map((opt) => (
+          <span className="feed__filter-label" id={ratingLabelId}>Rating</span>
+          <div className="feed__filter-options" role="radiogroup" aria-labelledby={ratingLabelId}>
+            {RATING_OPTIONS.map((opt, i) => (
               <button
                 key={opt.label}
                 type="button"
+                {...getRatingProps(i)}
                 className={`feed__filter-option${isRatingActive(opt) ? " feed__filter-option--active" : ""}`}
-                onClick={() => { setRating(opt.value); applyFilter(opt.value, period, sortBy); }}
+                onClick={() => selectRating(i)}
               >
                 {opt.label}
               </button>
@@ -75,14 +101,15 @@ const Feed = () => {
         </div>
 
         <div className="feed__filter-group">
-          <span className="feed__filter-label">Fecha</span>
-          <div className="feed__filter-options">
-            {PERIOD_OPTIONS.map((opt) => (
+          <span className="feed__filter-label" id={periodLabelId}>Fecha</span>
+          <div className="feed__filter-options" role="radiogroup" aria-labelledby={periodLabelId}>
+            {PERIOD_OPTIONS.map((opt, i) => (
               <button
                 key={opt.label}
                 type="button"
+                {...getPeriodProps(i)}
                 className={`feed__filter-option${period === opt.value ? " feed__filter-option--active" : ""}`}
-                onClick={() => { setPeriod(opt.value); applyFilter(rating, opt.value, sortBy); }}
+                onClick={() => selectPeriod(i)}
               >
                 {opt.label}
               </button>
@@ -91,14 +118,15 @@ const Feed = () => {
         </div>
 
         <div className="feed__filter-group">
-          <span className="feed__filter-label">Ordenar</span>
-          <div className="feed__filter-options">
-            {SORT_OPTIONS.map((opt) => (
+          <span className="feed__filter-label" id={sortLabelId}>Ordenar</span>
+          <div className="feed__filter-options" role="radiogroup" aria-labelledby={sortLabelId}>
+            {SORT_OPTIONS.map((opt, i) => (
               <button
                 key={opt.label}
                 type="button"
+                {...getSortProps(i)}
                 className={`feed__filter-option${sortBy === opt.value ? " feed__filter-option--active" : ""}`}
-                onClick={() => { setSortBy(opt.value); applyFilter(rating, period, opt.value); }}
+                onClick={() => selectSort(i)}
               >
                 {opt.label}
               </button>
@@ -111,7 +139,9 @@ const Feed = () => {
       <main className="feed__main">
         <div className="feed__header">
           <h1>Feed</h1>
-          <h2 className="feed__subtitle">Las últimas reseñas de la comunidad</h2>
+          {/* Bajada, no una sección: como encabezado ensucia el índice
+              que recorren los lectores de pantalla. */}
+          <p className="feed__subtitle">Las últimas reseñas de la comunidad</p>
         </div>
 
         {state === "loading" && <Loader />}
@@ -126,6 +156,10 @@ const Feed = () => {
         {state === "success" && data.length === 0 && (
           <p className="feed__empty">No hay reseñas que coincidan con los filtros.</p>
         )}
+
+        {/* Agrupa las cards (h3) bajo el h1 y da un punto de salto
+            para quien navega por encabezados. */}
+        <h2 className="visually-hidden">Resultados</h2>
 
         <div className="feed__grid">
           {data.map((post) => (

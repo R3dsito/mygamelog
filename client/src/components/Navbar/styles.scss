@@ -53,8 +53,20 @@
 
     // ── Tablet ─────────────────────────────────────────
     @media (max-width: 768px) {
+        // Se ocultan visualmente, no del árbol de accesibilidad: con
+        // display:none el lector de pantalla anunciaría links sin nombre.
         & ul li a span,
-        & ul li button span { display: none; }
+        & ul li button span {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
 
         & ul li a i,
         & ul li button i { margin-right: 0; }
@@ -83,12 +95,12 @@
                 opacity: 0.6;
             }
 
-            &:focus {
-                outline: none;
-            }
         }
 
         &__results {
+            list-style: none;
+            margin: 0;
+            padding: 0;
             position: absolute;
             top: calc(100% + 4px);
             left: 0;
@@ -123,7 +135,9 @@
             border-bottom: 1px solid rgba(245, 222, 179, 0.3);
             transition: background-color 0.2s;
 
-            &:hover {
+            // El mismo resaltado para mouse y para la opción activa por teclado.
+            &:hover,
+            &--active {
                 background-color: rgba(43, 140, 105, 0.25);
             }
 

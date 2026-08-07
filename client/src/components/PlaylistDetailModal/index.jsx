@@ -1,17 +1,30 @@
+import { useId } from "react";
 import { Link } from "react-router-dom";
+import useFocusTrap from "@/hooks/useFocusTrap";
 import "./styles.scss";
 
 const PlaylistDetailModal = ({ playlist, onClose }) => {
+  const titleId = useId();
+  const dialogRef = useFocusTrap(true, onClose);
+
   return (
     <div className="pdm-overlay" onClick={onClose}>
-      <div className="pdm-modal" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="pdm-modal"
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="pdm-modal__header">
           <div>
             <p className="pdm-modal__count">
               {playlist.games.length}{" "}
               {playlist.games.length === 1 ? "juego" : "juegos"}
             </p>
-            <h3 className="pdm-modal__title">{playlist.name}</h3>
+            <h3 className="pdm-modal__title" id={titleId}>{playlist.name}</h3>
             {playlist.description && (
               <p className="pdm-modal__desc">{playlist.description}</p>
             )}
@@ -25,8 +38,13 @@ const PlaylistDetailModal = ({ playlist, onClose }) => {
               </Link>
             )}
           </div>
-          <button className="pdm-modal__close" onClick={onClose}>
-            <i className="fa-solid fa-xmark" />
+          <button
+            type="button"
+            className="pdm-modal__close"
+            onClick={onClose}
+            aria-label="Cerrar"
+          >
+            <i className="fa-solid fa-xmark" aria-hidden="true" />
           </button>
         </div>
 

@@ -1,11 +1,14 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useId, useState } from "react";
 import { AuthContext } from "@/contexts/AuthContext";
 import useGetUserPlaylists from "@/hooks/useGetUserPlaylists";
 import useManagePlaylists from "@/hooks/useManagePlaylists";
+import useFocusTrap from "@/hooks/useFocusTrap";
 import "./styles.scss";
 
 const AddToPlaylistModal = ({ game, onClose }) => {
   const { user } = useContext(AuthContext);
+  const titleId = useId();
+  const dialogRef = useFocusTrap(true, onClose);
   const { data: playlists, fetchPlaylists, setData } = useGetUserPlaylists();
   const { createPlaylist, addGame, removeGame } = useManagePlaylists();
 
@@ -54,14 +57,27 @@ const AddToPlaylistModal = ({ game, onClose }) => {
 
   return (
     <div className="atp-overlay" onClick={onClose}>
-      <div className="atp-modal" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="atp-modal"
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="atp-modal__header">
           <div>
-            <h3 className="atp-modal__title">Agregar a playlist</h3>
+            <h3 className="atp-modal__title" id={titleId}>Agregar a playlist</h3>
             <p className="atp-modal__game">{game.gameName}</p>
           </div>
-          <button className="atp-modal__close" onClick={onClose}>
-            <i className="fa-solid fa-xmark" />
+          <button
+            type="button"
+            className="atp-modal__close"
+            onClick={onClose}
+            aria-label="Cerrar"
+          >
+            <i className="fa-solid fa-xmark" aria-hidden="true" />
           </button>
         </div>
 

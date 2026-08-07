@@ -201,12 +201,14 @@
             padding-top: 24px;
             border-top: 1px solid rgba(245, 222, 179, 0.15);
 
-            h4 {
+            h2 {
                 margin-top: 0;
             }
         }
 
-        & h4 {
+        // Son h2 por jerarquía (secciones bajo el h1 del juego); el tamaño
+        // chico es decisión visual, no un nivel de encabezado menor.
+        & h2 {
             font-size: 13px;
             font-weight: 700;
             letter-spacing: 1.5px;
@@ -216,7 +218,7 @@
             margin: 28px 0 14px;
         }
 
-        & h4:not(:first-of-type) {
+        & h2:not(:first-of-type) {
             padding-top: 24px;
             border-top: 1px solid rgba(245, 222, 179, 0.15);
         }
@@ -447,7 +449,6 @@
         border-radius: 10px;
         padding: 10px 12px;
         color: wheat;
-        outline: none;
         font-family: inherit;
         resize: vertical;
         transition: border-color 0.15s;

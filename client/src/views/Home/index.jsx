@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useId } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { Favorite, Loader, Review } from "@/components";
@@ -12,6 +12,7 @@ import useGetGames from "@/hooks/useGetGames";
 import useGetSuggestions from "@/hooks/useGetSuggestions";
 import useGetFeed from "@/hooks/useGetFeed";
 import useGetTrendingPlaylists from "@/hooks/useGetTrendingPlaylists";
+import useListboxNavigation from "@/hooks/useListboxNavigation";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -55,6 +56,17 @@ const Home = () => {
     setShowSuggestions(false);
   };
 
+  const listboxId = useId();
+  const results = state === "success" ? data ?? [] : [];
+  const listOpen = showSuggestions && results.length > 0;
+
+  const { activeIndex, setActiveIndex, handleKeyDown } = useListboxNavigation({
+    itemCount: results.length,
+    isOpen: listOpen,
+    onSelect: (i) => handleSelectResult(results[i].id),
+    onDismiss: () => setShowSuggestions(false),
+  });
+
   useEffect(() => {
     getSuggestions();
     getFeed();
@@ -88,7 +100,15 @@ const Home = () => {
           placeholder="Buscar juegos..."
           value={searchValue}
           onChange={handleOnChange}
+          onKeyDown={handleKeyDown}
           aria-label="Buscar juegos"
+          role="combobox"
+          aria-expanded={listOpen}
+          aria-controls={listboxId}
+          aria-autocomplete="list"
+          aria-activedescendant={
+            activeIndex >= 0 ? `${listboxId}-opt-${activeIndex}` : undefined
+          }
         />
 
         {showSuggestions && (
@@ -109,23 +129,37 @@ const Home = () => {
               </div>
             )}
 
-            {state === "success" &&
-              data.map((result) => (
-                <button
-                  key={result.id}
-                  type="button"
-                  className="home__results__result"
-                  onClick={() => handleSelectResult(result.id)}
-                >
-                  <div>
-                    <img src={result.background_image} alt={result.name} />
-                  </div>
+            {state === "success" && (
+              <ul id={listboxId} role="listbox" className="home__results__list">
+                {results.map((result, i) => (
+                  <li
+                    key={result.id}
+                    id={`${listboxId}-opt-${i}`}
+                    role="option"
+                    aria-selected={i === activeIndex}
+                    className={`home__results__result${
+                      i === activeIndex ? " home__results__result--active" : ""
+                    }`}
+                    onClick={() => handleSelectResult(result.id)}
+                    onMouseEnter={() => setActiveIndex(i)}
+                  >
+                    <div>
+                      <img src={result.background_image} alt="" />
+                    </div>
 
-                  <p>{result.name}</p>
-                </button>
-              ))}
+                    <p>{result.name}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         )}
+
+        <span className="visually-hidden" role="status" aria-live="polite">
+          {listOpen
+            ? `${results.length} ${results.length === 1 ? "juego encontrado" : "juegos encontrados"}`
+            : ""}
+        </span>
       </div>
 
       <div className="home__suggestions">

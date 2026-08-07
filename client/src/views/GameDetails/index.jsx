@@ -11,6 +11,7 @@ import useGetReviews from "@/hooks/useGetReviews";
 import usePostReview from "@/hooks/usePostReview";
 import useToggleFavorite from "@/hooks/useToggleFavorite";
 import useGetGameScore from "@/hooks/useGetGameScore";
+import useRadioGroup from "@/hooks/useRadioGroup";
 
 import { AuthContext } from "@/contexts/AuthContext";
 
@@ -185,6 +186,12 @@ const [confirmDelete, setConfirmDelete] = useState(false);
     else setReviewError("No se pudo eliminar el registro.");
   };
 
+  const { getRadioProps: getStarProps } = useRadioGroup({
+    count: 10,
+    selectedIndex: reviewData.score - 1,
+    onSelect: (index) => handleScoreChange(index + 1),
+  });
+
   const favoriteActive = editingPostId ? isFavorite : reviewData.addToFavorites;
 
   const submitLabel = editingPostId
@@ -324,26 +331,26 @@ const [confirmDelete, setConfirmDelete] = useState(false);
 
             <div className="game-details__content__grid">
               <div className="game-details__content__main">
-                <h4>Descripción:</h4>
+                <h2>Descripción:</h2>
                 <p>{gameData.description_raw}</p>
               </div>
 
               <aside className="game-details__content__side">
-                <h4>Géneros:</h4>
+                <h2>Géneros:</h2>
                 <div className="game-details__content__tags">
                   {gameData.tags.map((tag) => (
                     <span key={tag.id}>{tag.name}</span>
                   ))}
                 </div>
 
-                <h4>Plataformas:</h4>
+                <h2>Plataformas:</h2>
                 <div className="game-details__content__platforms">
                   {gameData.platforms.map((platform) => (
                     <span key={platform.platform.id}>{platform.platform.name}</span>
                   ))}
                 </div>
 
-                <h4>Sitio web:</h4>
+                <h2>Sitio web:</h2>
                 <div className="game-details__content__website">
                   <a href={gameData.website} target="_blank" rel="noopener noreferrer">
                     {gameData.website}
@@ -354,7 +361,7 @@ const [confirmDelete, setConfirmDelete] = useState(false);
             </div>
 
             <div className="game-details__content__reviews-section">
-              <h4>Reseñas populares:</h4>
+              <h2>Reseñas populares:</h2>
 
               <div className="game-details__content__reviews">
                 {reviewsState === "loading" && (
@@ -424,7 +431,11 @@ const [confirmDelete, setConfirmDelete] = useState(false);
               </span>
             </div>
 
-            <div className="log-modal__stars">
+            <div
+              className="log-modal__stars"
+              role="radiogroup"
+              aria-label="Puntuación del 1 al 10"
+            >
               {Array.from({ length: 10 }).map((_, index) => {
                 const starIndex = index + 1;
                 const filled = starIndex <= reviewData.score;
@@ -433,11 +444,15 @@ const [confirmDelete, setConfirmDelete] = useState(false);
                   <button
                     key={index}
                     type="button"
+                    {...getStarProps(index)}
                     onClick={() => handleScoreChange(starIndex)}
                     className={`star-button ${filled ? "active" : ""}`}
-                    aria-label={`Calificar ${starIndex} de 10`}
+                    aria-label={`${starIndex} de 10`}
                   >
-                    <i className={`fa-${filled ? "solid" : "regular"} fa-star`} />
+                    <i
+                      className={`fa-${filled ? "solid" : "regular"} fa-star`}
+                      aria-hidden="true"
+                    />
                   </button>
                 );
               })}

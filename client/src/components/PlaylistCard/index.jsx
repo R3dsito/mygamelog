@@ -25,7 +25,7 @@ const PlaylistCard = ({ playlist, isOwner, onDeleted, onUpdated, onClick }) => {
   };
 
   return (
-    <div className="playlist-card" onClick={!editing ? onClick : undefined} style={{ cursor: onClick && !editing ? "pointer" : "default" }}>
+    <div className="playlist-card">
       <div className="playlist-card__covers">
         {covers.length > 0 ? (
           covers.map((url, i) => (
@@ -59,7 +59,21 @@ const PlaylistCard = ({ playlist, isOwner, onDeleted, onUpdated, onClick }) => {
         </div>
       ) : (
         <div className="playlist-card__info">
-          <p className="playlist-card__name">{playlist.name}</p>
+          <p className="playlist-card__name">
+            {onClick ? (
+              // Solo el título entra en el orden de tabulación; su ::after
+              // extiende el área clickeable a toda la tarjeta.
+              <button
+                type="button"
+                className="playlist-card__open"
+                onClick={onClick}
+              >
+                {playlist.name}
+              </button>
+            ) : (
+              playlist.name
+            )}
+          </p>
           {playlist.description && (
             <p className="playlist-card__desc">{playlist.description}</p>
           )}
@@ -69,11 +83,19 @@ const PlaylistCard = ({ playlist, isOwner, onDeleted, onUpdated, onClick }) => {
 
       {isOwner && !editing && (
         <div className="playlist-card__actions" onClick={(e) => e.stopPropagation()}>
-          <button onClick={() => setEditing(true)} title="Editar">
-            <i className="fa-solid fa-pen" />
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            aria-label={`Editar playlist ${playlist.name}`}
+          >
+            <i className="fa-solid fa-pen" aria-hidden="true" />
           </button>
-          <button onClick={() => setConfirmOpen(true)} title="Eliminar">
-            <i className="fa-solid fa-trash" />
+          <button
+            type="button"
+            onClick={() => setConfirmOpen(true)}
+            aria-label={`Eliminar playlist ${playlist.name}`}
+          >
+            <i className="fa-solid fa-trash" aria-hidden="true" />
           </button>
         </div>
       )}

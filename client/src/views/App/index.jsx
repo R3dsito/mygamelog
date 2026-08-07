@@ -19,8 +19,13 @@ const App = () => {
   return (
     <AuthContextProvider>
       <div className="app">
+        <a className="skip-link" href="#main-content">
+          Saltar al contenido principal
+        </a>
+
         <Navbar />
 
+        <main id="main-content" tabIndex={-1}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/feed" element={<Feed />} />
@@ -34,6 +39,7 @@ const App = () => {
           <Route path="/profile/username/:username" element={<Profile />} />
           </Route>
         </Routes>
+        </main>
       </div>
     </AuthContextProvider>
   );
