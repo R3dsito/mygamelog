@@ -1,26 +1,29 @@
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Loader } from "@/components";
 import FeedCard from "@/components/FeedCard";
-import useGetFeed from "@/hooks/useGetFeed";
+import Pagination from "@/components/Pagination";
+import useGetFeed, { FEED_LIMIT } from "@/hooks/useGetFeed";
 import useRadioGroup from "@/hooks/useRadioGroup";
 import "./styles.scss";
 
+// `key` es lo que viaja en la URL; `value` es lo que entiende la API.
 const RATING_OPTIONS = [
-  { label: "Todos",   value: null },
-  { label: "8 – 10", value: [8, 10] },
-  { label: "5 – 7",  value: [5, 7] },
-  { label: "1 – 4",  value: [1, 4] },
+  { label: "Todos",  key: null,    value: null },
+  { label: "8 – 10", key: "8-10",  value: [8, 10] },
+  { label: "5 – 7",  key: "5-7",   value: [5, 7] },
+  { label: "1 – 4",  key: "1-4",   value: [1, 4] },
 ];
 
 const PERIOD_OPTIONS = [
-  { label: "Siempre",     value: null },
-  { label: "Este mes",    value: "month" },
-  { label: "Esta semana", value: "week" },
+  { label: "Siempre",     key: null,      value: null },
+  { label: "Este mes",    key: "month",   value: "month" },
+  { label: "Esta semana", key: "week",    value: "week" },
 ];
 
 const SORT_OPTIONS = [
-  { label: "Recientes",    value: null },
-  { label: "Más likeados", value: "likes" },
+  { label: "Recientes",    key: null,     value: null },
+  { label: "Más likeados", key: "likes",  value: "likes" },
 ];
 
 const buildParams = (rating, period, sortBy) => {
@@ -33,41 +36,68 @@ const buildParams = (rating, period, sortBy) => {
 };
 
 const Feed = () => {
-  const { state, data, hasMore, getFeed, loadMore } = useGetFeed();
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [rating, setRating] = useState(null);
-  const [period, setPeriod]       = useState(null);
-  const [sortBy, setSortBy]       = useState(null);
+  const { state, data, total, getFeed } = useGetFeed();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const resultsHeadingRef = useRef(null);
+  const isFirstLoad = useRef(true);
 
-  const applyFilter = (r, p, s) => getFeed(buildParams(r, p, s));
-  const isRatingActive = (opt) => JSON.stringify(rating) === JSON.stringify(opt.value);
+  // La URL es la única fuente de verdad: filtros y página en el mismo lugar,
+  // así una vista filtrada se puede compartir y "atrás" la restaura.
+  const page = Math.max(1, parseInt(searchParams.get("page"), 10) || 1);
+  const ratingIndex = Math.max(0, RATING_OPTIONS.findIndex((o) => o.key === searchParams.get("rating")));
+  const periodIndex = Math.max(0, PERIOD_OPTIONS.findIndex((o) => o.key === searchParams.get("period")));
+  const sortIndex   = Math.max(0, SORT_OPTIONS.findIndex((o) => o.key === searchParams.get("sort")));
+
+  const rating = RATING_OPTIONS[ratingIndex].value;
+  const period = PERIOD_OPTIONS[periodIndex].value;
+  const sortBy = SORT_OPTIONS[sortIndex].value;
+
+  const totalPages = Math.max(1, Math.ceil(total / FEED_LIMIT));
 
   const ratingLabelId = useId();
   const periodLabelId = useId();
   const sortLabelId   = useId();
 
-  const selectRating = (i) => { setRating(RATING_OPTIONS[i].value); applyFilter(RATING_OPTIONS[i].value, period, sortBy); };
-  const selectPeriod = (i) => { setPeriod(PERIOD_OPTIONS[i].value); applyFilter(rating, PERIOD_OPTIONS[i].value, sortBy); };
-  const selectSort   = (i) => { setSortBy(SORT_OPTIONS[i].value);   applyFilter(rating, period, SORT_OPTIONS[i].value); };
+  const updateParams = (patch, { resetPage = true } = {}) => {
+    const next = new URLSearchParams(searchParams);
+    Object.entries(patch).forEach(([k, v]) => {
+      if (v === null || v === undefined) next.delete(k);
+      else next.set(k, v);
+    });
+    // Cambiar un filtro invalida la página actual: siempre vuelve a la 1.
+    if (resetPage) next.delete("page");
+    setSearchParams(next);
+  };
 
   const { getRadioProps: getRatingProps } = useRadioGroup({
     count: RATING_OPTIONS.length,
-    selectedIndex: RATING_OPTIONS.findIndex(isRatingActive),
-    onSelect: selectRating,
+    selectedIndex: ratingIndex,
+    onSelect: (i) => updateParams({ rating: RATING_OPTIONS[i].key }),
   });
   const { getRadioProps: getPeriodProps } = useRadioGroup({
     count: PERIOD_OPTIONS.length,
-    selectedIndex: PERIOD_OPTIONS.findIndex((o) => o.value === period),
-    onSelect: selectPeriod,
+    selectedIndex: periodIndex,
+    onSelect: (i) => updateParams({ period: PERIOD_OPTIONS[i].key }),
   });
   const { getRadioProps: getSortProps } = useRadioGroup({
     count: SORT_OPTIONS.length,
-    selectedIndex: SORT_OPTIONS.findIndex((o) => o.value === sortBy),
-    onSelect: selectSort,
+    selectedIndex: sortIndex,
+    onSelect: (i) => updateParams({ sort: SORT_OPTIONS[i].key }),
   });
 
-  useEffect(() => { getFeed(); }, []);
+  useEffect(() => {
+    getFeed(buildParams(rating, period, sortBy), page);
+
+    // Al paginar, la lista se reemplaza sin recargar: hay que llevar el foco
+    // al encabezado de resultados o el teclado queda perdido abajo.
+    if (isFirstLoad.current) {
+      isFirstLoad.current = false;
+    } else {
+      resultsHeadingRef.current?.focus();
+      window.scrollTo({ top: 0 });
+    }
+  }, [searchParams]);
 
   return (
     <div className="feed">
@@ -91,8 +121,8 @@ const Feed = () => {
                 key={opt.label}
                 type="button"
                 {...getRatingProps(i)}
-                className={`feed__filter-option${isRatingActive(opt) ? " feed__filter-option--active" : ""}`}
-                onClick={() => selectRating(i)}
+                className={`feed__filter-option${ratingIndex === i ? " feed__filter-option--active" : ""}`}
+                onClick={() => updateParams({ rating: opt.key })}
               >
                 {opt.label}
               </button>
@@ -108,8 +138,8 @@ const Feed = () => {
                 key={opt.label}
                 type="button"
                 {...getPeriodProps(i)}
-                className={`feed__filter-option${period === opt.value ? " feed__filter-option--active" : ""}`}
-                onClick={() => selectPeriod(i)}
+                className={`feed__filter-option${periodIndex === i ? " feed__filter-option--active" : ""}`}
+                onClick={() => updateParams({ period: opt.key })}
               >
                 {opt.label}
               </button>
@@ -125,8 +155,8 @@ const Feed = () => {
                 key={opt.label}
                 type="button"
                 {...getSortProps(i)}
-                className={`feed__filter-option${sortBy === opt.value ? " feed__filter-option--active" : ""}`}
-                onClick={() => selectSort(i)}
+                className={`feed__filter-option${sortIndex === i ? " feed__filter-option--active" : ""}`}
+                onClick={() => updateParams({ sort: opt.key })}
               >
                 {opt.label}
               </button>
@@ -136,7 +166,8 @@ const Feed = () => {
         </div>
       </aside>
 
-      <main className="feed__main">
+      {/* div, no <main>: el landmark main lo aporta App y solo puede haber uno. */}
+      <div className="feed__main">
         <div className="feed__header">
           <h1>Feed</h1>
           {/* Bajada, no una sección: como encabezado ensucia el índice
@@ -158,8 +189,14 @@ const Feed = () => {
         )}
 
         {/* Agrupa las cards (h3) bajo el h1 y da un punto de salto
-            para quien navega por encabezados. */}
-        <h2 className="visually-hidden">Resultados</h2>
+            para quien navega por encabezados. Recibe el foco al paginar. */}
+        <h2
+          className="visually-hidden"
+          ref={resultsHeadingRef}
+          tabIndex={-1}
+        >
+          Resultados{state === "success" && total > 0 ? ` — página ${page} de ${totalPages}` : ""}
+        </h2>
 
         <div className="feed__grid">
           {data.map((post) => (
@@ -178,21 +215,15 @@ const Feed = () => {
           ))}
         </div>
 
-        {hasMore && state === "success" && (
-          <button
-            type="button"
-            className="feed__load-more"
-            onClick={async () => {
-              setLoadingMore(true);
-              await loadMore();
-              setLoadingMore(false);
-            }}
-            disabled={loadingMore}
-          >
-            {loadingMore ? "Cargando..." : "Cargar más reseñas"}
-          </button>
+        {state === "success" && (
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            onChange={(p) => updateParams({ page: p > 1 ? p : null }, { resetPage: false })}
+            label="Paginación del feed"
+          />
         )}
-      </main>
+      </div>
     </div>
   );
 };

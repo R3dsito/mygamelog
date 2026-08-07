@@ -13,6 +13,7 @@ const FeedCard = ({ username, imagen, gameId, gameName, imageUrl, content, ratin
   const [liking, setLiking] = useState(false);
 
   const isLiked = user ? likes.some((id) => id.toString() === user.id) : false;
+  const hasText = Boolean(content?.trim());
   const preview = content?.length > MAX_PREVIEW
     ? content.slice(0, MAX_PREVIEW).trimEnd() + "…"
     : content;
@@ -66,11 +67,7 @@ const FeedCard = ({ username, imagen, gameId, gameName, imageUrl, content, ratin
 
         {rating > 0 && <p className="feed-card__rating">{rating} / 10</p>}
 
-        {preview && (
-          <Link to={`/review/${postId}`} className="feed-card__text-link">
-            <p className="feed-card__text">{preview}</p>
-          </Link>
-        )}
+        {hasText && <p className="feed-card__text">{preview}</p>}
 
         <div className="feed-card__footer">
           <button
@@ -83,6 +80,12 @@ const FeedCard = ({ username, imagen, gameId, gameName, imageUrl, content, ratin
             <i className={`fa-${isLiked ? "solid" : "regular"} fa-heart`} aria-hidden="true" />
             {likes.length > 0 && <span>{likes.length}</span>}
           </button>
+
+          {/* Siempre presente: antes el único acceso al detalle era el texto,
+              así que los registros sin reseña no tenían forma de abrirse. */}
+          <Link to={`/review/${postId}`} className="feed-card__detail-link">
+            {hasText ? "Ver reseña" : "Ver detalle"}
+          </Link>
         </div>
       </div>
     </article>

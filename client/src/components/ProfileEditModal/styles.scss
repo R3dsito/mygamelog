@@ -1,14 +1,8 @@
 // Scoped under `.modal.modal--dark` (two classes) so these rules win over the
-// shared Modal's global `.modal input` / `.modal form` / `.modal div img` styles.
+// shared Modal's global `.modal input` / `.modal form` styles.
+// El modificador --dark en sí vive en Modal/styles.scss, que es donde
+// corresponde: lo comparten varias modales, no solo esta.
 .modal.modal--dark {
-  background-color: rgb(2, 22, 3);
-  border: 2px solid wheat;
-
-  .modal__title p,
-  .modal__close-button i {
-    color: wheat;
-  }
-
   .pem {
     display: flex;
     flex-direction: column;

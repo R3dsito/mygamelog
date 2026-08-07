@@ -12,6 +12,7 @@ import {
 } from "@/views";
 
 import { Navbar } from "@/components";
+import Footer from "@/components/Footer";
 
 import { AuthContextProvider } from "@/contexts/AuthContext";
 
@@ -40,6 +41,8 @@ const App = () => {
           </Route>
         </Routes>
         </main>
+
+        <Footer />
       </div>
     </AuthContextProvider>
   );

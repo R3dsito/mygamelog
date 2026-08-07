@@ -68,13 +68,22 @@ const ReviewDetail = () => {
         </div>
       )}
 
-      <div className="review-detail__body">
-        <Link to="/feed" className="review-detail__back">← Volver al feed</Link>
+      <article className="review-detail__body">
+        <Link to="/feed" className="review-detail__back">
+          <span aria-hidden="true">←</span> Volver al feed
+        </Link>
 
         <div className="review-detail__user">
-          <Link to={`/profile/username/${userId?.username}`} className="review-detail__avatar">
+          {/* El avatar duplica el link al perfil que ya está al lado:
+              se oculta para no anunciar el mismo destino dos veces. */}
+          <Link
+            to={`/profile/username/${userId?.username}`}
+            className="review-detail__avatar"
+            aria-hidden="true"
+            tabIndex={-1}
+          >
             {userId?.imagen
-              ? <img src={userId.imagen} alt={userId.username} />
+              ? <img src={userId.imagen} alt="" />
               : <i className="fa-solid fa-user" aria-hidden="true" />
             }
           </Link>
@@ -82,15 +91,19 @@ const ReviewDetail = () => {
             <Link to={`/profile/username/${userId?.username}`} className="review-detail__username">
               @{userId?.username}
             </Link>
-            <p className="review-detail__date">{dayjs(createdAt).format("D MMM YYYY")}</p>
+            <p className="review-detail__date">
+              <time dateTime={createdAt}>{dayjs(createdAt).format("D [de] MMMM [de] YYYY")}</time>
+            </p>
           </div>
         </div>
 
         {rating > 0 && (
-          <div className="review-detail__rating">
-            <span className="review-detail__rating-score">{rating}</span>
-            <span className="review-detail__rating-max">/10</span>
-          </div>
+          <p className="review-detail__rating">
+            {/* Los dos spans visuales se leerían como "6" "/10" por separado. */}
+            <span className="visually-hidden">Puntuación: {rating} de 10</span>
+            <span className="review-detail__rating-score" aria-hidden="true">{rating}</span>
+            <span className="review-detail__rating-max" aria-hidden="true">/10</span>
+          </p>
         )}
 
         {content?.trim() ? (
@@ -117,7 +130,7 @@ const ReviewDetail = () => {
             Ver juego <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" />
           </Link>
         </div>
-      </div>
+      </article>
     </div>
   );
 };

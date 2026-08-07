@@ -5,15 +5,17 @@
     padding: 8px 12px;
     border-bottom: 1px solid wheat;
 
-    & div {
+    // Acotado al logo: como `& div img` alcanzaba a cualquier imagen dentro
+    // de un div del navbar, deformaba los avatares del buscador.
+    &__logo {
         display: flex;
         align-items: center;
         justify-content: center;
-    }
 
-    & div img {
-        width: 100%;
-        height: 50px;
+        img {
+            width: 100%;
+            height: 50px;
+        }
     }
 
     & ul {

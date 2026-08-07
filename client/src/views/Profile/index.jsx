@@ -1,10 +1,11 @@
 import { useEffect, useContext, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 
-import { Loader, Review, Modal } from "@/components";
+import { Loader, Review } from "@/components";
 import PlaylistCard from "@/components/PlaylistCard";
 import PlaylistDetailModal from "@/components/PlaylistDetailModal";
 import ProfileEditModal from "@/components/ProfileEditModal";
+import UserListModal from "@/components/UserListModal";
 import api from "@/api/axiosInstance";
 import useGetSuggestions from "@/hooks/useGetSuggestions";
 import useGetUserReviews from "@/hooks/useGetUserReviews";
@@ -354,61 +355,23 @@ const handleProfileSaved = (newUsername) => {
 )}
 
 {showFollowersModal && (
-  <Modal
+  <UserListModal
     isOpen={showFollowersModal}
     setIsOpen={setShowFollowersModal}
     title="Seguidores"
-  >
-    {userData?.followers?.length > 0 ? (
-      <ul>
-        {userData.followers.map((user) => (
-          <li key={user._id}>
-            <Link
-              to={`/profile/username/${user.username}`}
-              className="modal__followers"
-              onClick={() => setShowFollowersModal(false)}
-            >
-              <div>
-                <img className="userImage" src={user.imagen || DEFAULT_AVATAR} alt={user.username} />
-              </div>
-              {user.username}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <p>No tiene seguidores.</p>
-    )}
-  </Modal>
+    users={userData?.followers ?? []}
+    emptyMessage="No tiene seguidores."
+  />
 )}
 
 {showFollowingModal && (
-  <Modal
+  <UserListModal
     isOpen={showFollowingModal}
     setIsOpen={setShowFollowingModal}
     title="Seguidos"
-  >
-    {userData?.following?.length > 0 ? (
-      <ul>
-        {userData.following.map((user) => (
-          <li key={user._id}>
-            <Link
-              to={`/profile/username/${user.username}`}
-              className="modal__followers"
-              onClick={() => setShowFollowingModal(false)}
-            >
-              <div>
-                <img className="userImage" src={user.imagen || DEFAULT_AVATAR} alt={user.username} />
-              </div>
-              {user.username}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <p>No sigue a nadie.</p>
-    )}
-  </Modal>
+    users={userData?.following ?? []}
+    emptyMessage="No sigue a nadie."
+  />
 )}
 
 <ProfileEditModal

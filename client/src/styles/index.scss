@@ -1,12 +1,42 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Tiny5&display=swap');
 
+// ── Identidad de marca ───────────────────────────────────────
+// Único lugar donde se definen los valores. Hoy la paleta está repetida
+// a mano por todo el proyecto; lo nuevo usa estos tokens y lo existente
+// se puede ir migrando sin apuro.
+:root {
+    // Paleta
+    --mgl-bg: #021603;
+    --mgl-surface: rgb(2, 22, 3);
+    --mgl-ink: wheat;              // #f5deb3
+    --mgl-accent: #2b8c69;         // verde: acciones y selección
+    --mgl-highlight: #e05c7a;      // rosa: likes y destructivo
+    --mgl-star: #f5c518;           // amarillo: puntuaciones
+    --mgl-focus: #7fd1ae;          // anillo de foco
+
+    // Bordes translúcidos derivados de la tinta
+    --mgl-line: rgba(245, 222, 179, 0.15);
+    --mgl-line-strong: rgba(245, 222, 179, 0.4);
+
+    // Tipografía: Poppins para leer, Tiny5 para la voz de marca
+    --mgl-font: 'Poppins', sans-serif;
+    --mgl-font-brand: 'Tiny5', 'Poppins', monospace;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
     position: relative;
-    font-family: 'Poppins', sans-serif;
-    color: wheat;
+    font-family: var(--mgl-font);
+    color: var(--mgl-ink);
+}
+
+// La fuente pixel es la firma de la marca: se venía descargando sin usarse.
+.brand-wordmark {
+    font-family: var(--mgl-font-brand);
+    letter-spacing: 0.5px;
+    text-transform: lowercase;
 }
 
 body,
@@ -29,7 +59,7 @@ p {
 // Indicador de foco global. Se aplica con :focus-visible para que solo
 // aparezca en navegación por teclado, no al hacer click con el mouse.
 :focus-visible {
-    outline: 3px solid #7fd1ae;
+    outline: 3px solid var(--mgl-focus);
     outline-offset: 2px;
     border-radius: 4px;
 }

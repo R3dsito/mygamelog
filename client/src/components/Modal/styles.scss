@@ -27,16 +27,9 @@
     margin: 12px;
     animation: modal-in 0.3s ease-out forwards;
 
-    & div img {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-    }
-    & label img{
-        width: 400px;
-        height: 400px;
-        border-radius: 50%;
-        border: 1px solid wheat;}
+    // Se quitaron `.modal div img` y `.modal label img`: eran del markup viejo
+    // de seguidores (ya inexistente) y, por ser descendientes genéricos,
+    // le ganaban por especificidad a los estilos propios de cada modal.
     &__title {
         width: 100%;
         display: flex;
@@ -69,22 +62,65 @@
         animation: modal-out 0.3s ease-out forwards;
     }
 
+    // Variante oscura compartida por todas las modales de la app.
+    // Doble clase para ganarle a las reglas genéricas `.modal ...` de arriba.
+    &.modal--dark {
+        background-color: rgb(2, 22, 3);
+        border: 2px solid wheat;
+
+        .modal__title p,
+        .modal__close-button i {
+            color: wheat;
+        }
+    }
+
     &__content {
         margin-top: 32px;
 
     }
-    &__followers {
+    // Lista de usuarios (seguidores / seguidos), con el mismo lenguaje
+    // visual que las filas de las otras modales.
+    &__user-list {
         list-style: none;
-        text-decoration: none;
-        color: #021603f6;
+        margin: 0;
+        padding: 0;
+        max-height: 55vh;
+        overflow-y: auto;
+    }
+
+    &__user-row {
         display: flex;
         align-items: center;
-        padding: 12px;
         gap: 12px;
-        border-bottom: 1px solid lightgray;
+        padding: 10px 8px;
+        border-radius: 8px;
+        text-decoration: none;
+        color: wheat;
+        transition: background-color 0.15s;
+
+        &:hover {
+            background-color: rgba(43, 140, 105, 0.25);
+        }
+
+        img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        span {
+            font-weight: 600;
+            font-size: 14px;
+        }
     }
-    &__followers:hover {
-        color: green;
+
+    &__empty {
+        font-size: 13px;
+        opacity: 0.6;
+        text-align: center;
+        padding: 12px 0;
     }
     & a{
         text-decoration: none;

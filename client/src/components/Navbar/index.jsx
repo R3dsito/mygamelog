@@ -57,9 +57,9 @@ const Navbar = () => {
   });
 
   return (
-    <nav className="navbar">
+    <nav className="navbar" aria-label="Principal">
       <NavLink to="/" aria-label="Inicio — myGameLog">
-        <div>
+        <div className="navbar__logo">
           <img src={LOGO} alt="myGameLog" />
         </div>
       </NavLink>
