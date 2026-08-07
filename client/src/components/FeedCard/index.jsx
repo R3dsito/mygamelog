@@ -37,14 +37,24 @@ const FeedCard = ({ username, imagen, gameId, gameName, imageUrl, content, ratin
 
   return (
     <article className="feed-card">
-      <Link to={`/game-details?id=${gameId}`} className="feed-card__cover">
+      {/* La portada entra a la reseña; el título sigue yendo al juego.
+          Antes ambos apuntaban a game-details, era un link duplicado. */}
+      <Link
+        to={`/review/${postId}`}
+        className="feed-card__cover"
+        aria-label={`Ver ${hasText ? "reseña" : "registro"} de ${gameName} por ${username}`}
+      >
         {imageUrl ? (
-          <img src={imageUrl} alt={gameName} />
+          <img src={imageUrl} alt="" />
         ) : (
           <div className="feed-card__cover-empty">
             <i className="fa-solid fa-gamepad" aria-hidden="true" />
           </div>
         )}
+
+        <span className="feed-card__cover-overlay" aria-hidden="true">
+          {hasText ? "Ver reseña" : "Ver detalle"}
+        </span>
       </Link>
 
       <div className="feed-card__body">
@@ -80,12 +90,6 @@ const FeedCard = ({ username, imagen, gameId, gameName, imageUrl, content, ratin
             <i className={`fa-${isLiked ? "solid" : "regular"} fa-heart`} aria-hidden="true" />
             {likes.length > 0 && <span>{likes.length}</span>}
           </button>
-
-          {/* Siempre presente: antes el único acceso al detalle era el texto,
-              así que los registros sin reseña no tenían forma de abrirse. */}
-          <Link to={`/review/${postId}`} className="feed-card__detail-link">
-            {hasText ? "Ver reseña" : "Ver detalle"}
-          </Link>
         </div>
       </div>
     </article>

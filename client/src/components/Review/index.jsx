@@ -33,6 +33,9 @@ const Review = ({ username, imagen, content, rating, onDelete, gameName, imageUr
 
   // Un post sin texto es un registro de puntuación, no una reseña.
   const hasText = Boolean(content?.trim());
+  // La portada es la entrada a la reseña. Sin portada (GameDetails no la pasa)
+  // hace falta el link del footer, o la card se queda sin salida.
+  const hasCover = Boolean(imageUrl && gameId && postId);
   const isTruncatable = content?.length > MAX_PREVIEW_CHARS;
   const displayContent = isTruncatable && !expanded
     ? content.slice(0, MAX_PREVIEW_CHARS).trimEnd() + "…"
@@ -47,10 +50,17 @@ const Review = ({ username, imagen, content, rating, onDelete, gameName, imageUr
 
   return (
     <div className="review">
-      {imageUrl && gameId && (
+      {hasCover && (
         <div className="review__image-container">
-          <Link to={`/game-details?id=${gameId}`} className="review__image">
-            <img src={imageUrl} alt={gameName} />
+          <Link
+            to={`/review/${postId}`}
+            className="review__image"
+            aria-label={`Ver ${hasText ? "reseña" : "registro"} de ${gameName} por ${username}`}
+          >
+            <img src={imageUrl} alt="" />
+            <span className="review__image-overlay" aria-hidden="true">
+              {hasText ? "Ver reseña" : "Ver detalle"}
+            </span>
           </Link>
         </div>
       )}
@@ -105,13 +115,15 @@ const Review = ({ username, imagen, content, rating, onDelete, gameName, imageUr
             </button>
           )}
 
-          {postId && (
+          {postId && !hasCover && (
             <Link to={`/review/${postId}`} className="review__detail-link">
               {hasText ? "Ver reseña" : "Ver detalle"}
             </Link>
           )}
 
-          {loggedInUser?.username === username && (
+          {/* Exige onDelete además de ser el autor: en Home no se pasa handler
+              y el botón aparecía igual, sin hacer nada al clickearlo. */}
+          {loggedInUser?.username === username && onDelete && (
             <button className="review__delete" onClick={onDelete} aria-label="Eliminar reseña">
               <i className="fa-solid fa-trash" aria-hidden="true"></i>Eliminar
             </button>
